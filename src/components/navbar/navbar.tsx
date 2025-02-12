@@ -17,7 +17,7 @@ import { Navbar } from "../ui/navbar";
 export default function AppNavbar() {
   return (
     <Navbar className="fixed top-0">
-      <Navbar.Nav className="py-3 bg-[#3c6382] ">
+      <Navbar.Nav className="py-3 bg-[#1e272e] ">
         <Navbar.Logo
           aria-label="Goto documenation of Navbar"
           href="/docs/2.x/components/layouts/navbar"
@@ -31,7 +31,7 @@ export default function AppNavbar() {
         </Navbar.Section>
       </Navbar.Nav>
 
-      <Navbar.Compact className=" bg-[#3c6382] ">
+      <Navbar.Compact className=" bg-[#1e272e] ">
         <Navbar.Flex>
           <Navbar.Logo
             className="font-bold text-white"
