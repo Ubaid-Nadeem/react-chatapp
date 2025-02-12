@@ -131,8 +131,8 @@ export default function Chats() {
         {chatWith && (
           <>
             {" "}
-            <div className="header fixed w-full px-3">
-              <div className="flex items-center p-[10px]  bg-white">
+            <div className="header fixed w-full ">
+              <div className="flex items-center p-[10px]  bg-white px-5 z-40">
                 <svg
                   onClick={() => setIsChatting(!isChatting)}
                   xmlns="http://www.w3.org/2000/svg"
@@ -212,6 +212,7 @@ export default function Chats() {
               </div>
               <Separator />
             </div>
+
             <div className="messages-container bg-gray-100 mt-[60px] h-[calc(100vh-172px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
                 <div className="chat-bubble">Hello, {chatWith.name}</div>
@@ -222,6 +223,8 @@ export default function Chats() {
                  Hey, How are doing Today?
                 </div>
               </div>
+
+              
             </div>
             <div>
               <div className="input-container fixed bottom-0 p-2 px-5 w-full flex items-center gap-5  bg-[#1e272e]  md:justify-center">
