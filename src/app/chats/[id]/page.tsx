@@ -19,9 +19,9 @@ export default function UserChats() {
 
   const messagesEndRef = useRef<any>(null);
 
-  useEffect(() => {
-    setIsloaded(false);
-  }, []);
+useEffect(()=>{
+setIsloaded(false)
+},[])
 
   useEffect(() => {
     scrollToBottom();
