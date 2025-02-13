@@ -19,9 +19,9 @@ export default function UserChats() {
 
   const messagesEndRef = useRef<any>(null);
 
-useEffect(()=>{
-setIsloaded(false)
-},[])
+  useEffect(() => {
+    setIsloaded(false);
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -34,17 +34,17 @@ setIsloaded(false)
   return isLoaded ? (
     <Loaders />
   ) : (
-    <div className="flex">
+    <div className="flex overflow-hidden ">
       <Sidebar />
 
       <div
-        className={`transition-transform sm:translate-x-0 absolute mt-[56px] md:relative left-0 w-full md:block transition-transform sm:translate-x-0 chats-container sm:w-[75%]  h-[calc(100vh-49px)] ${
+        className={`bg-gray-200 transition-transform sm:translate-x-0  mt-[56px] md:relative left-0 w-full md:block transition-transform sm:translate-x-0 chats-container sm:w-[75%]  h-[calc(100vh-49px)] ${
           isChatting ? "block" : "translate-x-full"
         }`}
       >
         {chatWith && (
           <>
-            <div className="header fixed w-full z-50">
+            <div className="shadow-md header fixed top-0 w-full z-50 ">
               <div className="flex items-center p-[10px]  bg-white px-5 z-50">
                 <svg
                   onClick={() => {
@@ -127,10 +127,10 @@ setIsloaded(false)
                   </svg>
                 </div>
               </div>
-              <Separator />
+            
             </div>
 
-            <div className="mt-[60px] z-10 messages-container bg-gray-100 h-[calc(100vh-172px)] overflow-y-scroll py-3 px-2">
+            <div className="absolute w-full top-[60px] z-10 messages-container  h-[calc(100vh-172px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
                 <div className="chat-bubble">Hello, {chatWith.name}</div>
               </div>
@@ -148,11 +148,11 @@ setIsloaded(false)
                   </div>
                 );
               })}
-              <div ref={messagesEndRef} />
+              {/* <div ref={messagesEndRef} /> */}
             </div>
 
             <div>
-              <div className="input-container fixed bottom-0 p-2 px-5 w-full flex items-center gap-2    md:justify-center">
+              <div className="input-container fixed bottom-2 p-2 px-5 w-full flex items-center gap-2    md:justify-center">
                 <input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
