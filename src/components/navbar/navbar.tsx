@@ -16,7 +16,7 @@ import { Navbar } from "../ui/navbar";
 
 export default function AppNavbar() {
   return (
-    <Navbar className="fixed top-0">
+    <Navbar className="fixed top-0 z-40">
       <Navbar.Nav className="py-3 bg-[#1e272e] ">
         <Navbar.Logo
           aria-label="Goto documenation of Navbar"
