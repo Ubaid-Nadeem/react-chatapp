@@ -36,8 +36,8 @@ export default function UserChats() {
       >
         {chatWith && (
           <>
-            <div className="header fixed w-full ">
-              <div className="flex items-center p-[10px]  bg-white px-5 z-40">
+            <div className="header fixed w-full z-50">
+              <div className="flex items-center p-[10px]  bg-white px-5 z-50">
                 <svg
                   onClick={() => {
                     setIsChatting(!isChatting);
@@ -122,7 +122,7 @@ export default function UserChats() {
               <Separator />
             </div>
 
-            <div className="messages-container bg-gray-100 mt-[60px] h-[calc(100vh-172px)] overflow-y-scroll py-3 px-2">
+            <div className="mt-[60px] z-10 messages-container bg-gray-100 h-[calc(100vh-172px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
                 <div className="chat-bubble">Hello, {chatWith.name}</div>
               </div>
@@ -158,7 +158,6 @@ export default function UserChats() {
                       setMessages([...messages, { message: inputValue }]);
                       setInputValue("");
 
-                      // msgContainer.current.scrollTop = msgContainer.current?.scrollHeigh
                     }}
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
