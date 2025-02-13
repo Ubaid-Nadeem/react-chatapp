@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Separator } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
+import Loaders from "@/components/loader/page";
 
 export default function UserChats() {
   const { id } = useParams();
@@ -14,8 +15,13 @@ export default function UserChats() {
   const [chatWith, setChatWith] = useState<any>({ name: "Ubaid Nadeem" });
   const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [isLoaded, setIsloaded] = useState(true);
 
   const messagesEndRef = useRef<any>(null);
+
+  useEffect(() => {
+    setIsloaded(false);
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -25,7 +31,9 @@ export default function UserChats() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  return (
+  return isLoaded ? (
+    <Loaders />
+  ) : (
     <div className="flex">
       <Sidebar />
 
@@ -157,7 +165,6 @@ export default function UserChats() {
                     onClick={() => {
                       setMessages([...messages, { message: inputValue }]);
                       setInputValue("");
-
                     }}
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"

@@ -13,7 +13,6 @@ export default function Sidebar() {
   const route = useRouter();
   const path = usePathname();
 
-  
   const users = [
     {
       name: "Ubaid",
@@ -55,6 +54,21 @@ export default function Sidebar() {
       message: "Hey Shehraz bhai, How are you?",
       time: "12:40",
     },
+    {
+      name: "Shehraz bhai",
+      message: "Hey Shehraz bhai, How are you?",
+      time: "12:40",
+    },
+    {
+      name: "Shehraz bhai",
+      message: "Hey Shehraz bhai, How are you?",
+      time: "12:40",
+    },
+    {
+      name: "Shehraz bhai",
+      message: "Hey Shehraz bhai, How are you?",
+      time: "12:40",
+    },
   ];
 
   useEffect(() => {
@@ -68,7 +82,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`mt-[56px] overflow-y-scroll w-full transition-transform sm:translate-x-0 z-40 side-bar-users sm:w-[25%] h-[calc(100vh-56px)]  
+      className={`mt-[56px]  w-full transition-transform sm:translate-x-0 z-40 side-bar-users sm:w-[25%] h-[calc(100vh-56px)]  
             ${isChatting ? "-translate-x-full" : "translate-x-0"} 
             ${path != "/chats" ? "hidden md:block" : ""}
             `}
@@ -98,7 +112,7 @@ export default function Sidebar() {
         </div>
       </button> */}
 
-      <div className="  p-3 flex justify-between items-center ">
+      <div className="shadow-md fixed z-40 bg-white p-3 flex justify-between items-center w-full">
         {search ? (
           <TextField placeholder="Search Name" className="w-[90%]" />
         ) : (
@@ -147,9 +161,7 @@ export default function Sidebar() {
         )}
       </div>
 
-      <Separator />
-
-      <div className="mt-2  ">
+      <div className="mt-[60px] w-full  overflow-y-scroll  h-[calc(100vh-56px)]">
         {users.map((user, index) => {
           return (
             <div

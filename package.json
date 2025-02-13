@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
     "justd-icons": "^1.10.24",
     "motion": "^12.4.2",
     "next": "15.1.6",
