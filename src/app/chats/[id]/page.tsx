@@ -142,7 +142,7 @@ export default function UserChats() {
               </div>
             </div>
 
-            <div className="fixed w-full top-[60px] z-10 messages-container  h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
+            <div className=" w-full mt-[60px] z-10 messages-container  h-[calc(100vh-150px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
                 <div className="chat-bubble">Hello, {chatWith.name}</div>
               </div>
