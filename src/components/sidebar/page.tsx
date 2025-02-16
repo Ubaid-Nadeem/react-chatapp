@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Separator, TextField } from "../ui";
 import { useRouter, usePathname } from "next/navigation";
+import { div } from "motion/react-client";
 
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
@@ -82,36 +83,11 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`mt-[56px]  w-full transition-transform sm:translate-x-0 z-40 side-bar-users sm:w-[25%] h-[calc(100vh-56px)]  
+      className={`relative transition-transform sm:translate-x-0 z-40  w-full sm:w-[25%] h-[calc(100vh-56px)]
             ${isChatting ? "-translate-x-full" : "translate-x-0"} 
             ${path != "/chats" ? "hidden md:block" : ""}
             `}
     >
-      {/* <button className="fixed z-50">
-        <div className="chat chat-start fixed bottom-5 right-5 z-50">
-          <div className="chat-bubble bg-black w-[20px] h-[20px] text-white flex items-center justify-center p-0 m-0">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="justd-icons size-4"
-              data-slot="icon"
-              aria-hidden="true"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 5v14m-7-7h14"
-              ></path>
-            </svg>
-          </div>
-        </div>
-      </button> */}
-
       <div className="shadow-md fixed z-40 bg-white p-3 flex justify-between items-center w-full">
         {search ? (
           <TextField placeholder="Search Name" className="w-[90%]" />
@@ -139,29 +115,51 @@ export default function Sidebar() {
             ></path>
           </svg>
         ) : (
-          <svg
-            onClick={() => setSearch(!search)}
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            fill="none"
-            viewBox="0 0 24 24"
-            className="justd-icons size-5 cursor-pointer"
-            data-slot="icon"
-            aria-hidden="true"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="1.5"
-              d="m20.25 20.25-4.123-4.123m0 0A7.25 7.25 0 1 0 5.873 5.873a7.25 7.25 0 0 0 10.253 10.253Z"
-            ></path>
-          </svg>
+          <div className="flex items-center gap-2">
+            <svg
+              onClick={() => setSearch(!search)}
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              fill="none"
+              viewBox="0 0 24 24"
+              className="justd-icons size-5 cursor-pointer"
+              data-slot="icon"
+              aria-hidden="true"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+                d="m20.25 20.25-4.123-4.123m0 0A7.25 7.25 0 1 0 5.873 5.873a7.25 7.25 0 0 0 10.253 10.253Z"
+              ></path>
+            </svg>
+           <div className="hover:bg-gray-100 rounded-full p-2 cursor-pointer">
+           <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              fill="none"
+              viewBox="0 0 24 24"
+              className="justd-icons size-4"
+              data-slot="icon"
+              aria-hidden="true"
+            >
+              <path
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+              ></path>
+            </svg>
+           </div>
+          </div>
         )}
       </div>
 
-      <div className="mt-[60px] w-full  overflow-y-scroll  h-[calc(100vh-56px)]">
+      <div className="absolute top-[60px] w-full  overflow-y-scroll  h-[calc(100vh-56px)] z-50">
         {users.map((user, index) => {
           return (
             <div

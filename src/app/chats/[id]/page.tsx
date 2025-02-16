@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Separator } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
 import Loaders from "@/components/loader/page";
-
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { increment } from "@/redux/slices/counter";
 export default function UserChats() {
   const { id } = useParams();
   const route = useRouter();
@@ -16,8 +17,12 @@ export default function UserChats() {
   const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoaded, setIsloaded] = useState(true);
-
+  const [containerHeight, setContainerHeight] = useState(0);
   const messagesEndRef = useRef<any>(null);
+  const containerRef = useRef<any>(null);
+  const name = useAppSelector((state) => state.counter);
+
+  // console.log(name);
 
   useEffect(() => {
     setIsloaded(false);
@@ -34,11 +39,12 @@ export default function UserChats() {
   return isLoaded ? (
     <Loaders />
   ) : (
-    <div className="flex overflow-hidden ">
+    <div className="flex">
       <Sidebar />
+      
 
       <div
-        className={`bg-gray-200 transition-transform sm:translate-x-0  mt-[56px] md:relative left-0 w-full md:block transition-transform sm:translate-x-0 chats-container sm:w-[75%]  h-[calc(100vh-49px)] ${
+        className={`fixed top-0 z-50 bg-gray-200 transition-transform sm:translate-x-0  md:relative left-0 w-full md:block transition-transform sm:translate-x-0 sm:w-[75%] h-screen  md:h-[calc(100vh)] ${
           isChatting ? "block" : "translate-x-full"
         }`}
       >
@@ -84,7 +90,14 @@ export default function UserChats() {
                 <div className="flex flex-col ml-2 w-full">
                   <div className="flex justify-between">
                     <h3 className="font-bold text-[#2f3542] text-[16px]">
-                      {chatWith?.name}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // useAppDispatch(increment(1))
+                        }}
+                      >
+                        click
+                      </button>
                     </h3>
                   </div>
                 </div>
@@ -127,10 +140,9 @@ export default function UserChats() {
                   </svg>
                 </div>
               </div>
-            
             </div>
 
-            <div className="absolute w-full top-[60px] z-10 messages-container  h-[calc(100vh-172px)] overflow-y-scroll py-3 px-2">
+            <div className="fixed w-full top-[60px] z-10 messages-container  h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
                 <div className="chat-bubble">Hello, {chatWith.name}</div>
               </div>
@@ -148,42 +160,44 @@ export default function UserChats() {
                   </div>
                 );
               })}
-              {/* <div ref={messagesEndRef} /> */}
+
+              {<div ref={messagesEndRef} />}
             </div>
 
-            <div>
-              <div className="input-container fixed bottom-2 p-2 px-5 w-full flex items-center gap-2    md:justify-center">
-                <input
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  type="text"
-                  placeholder="Enter a Message"
-                  className="w-[90%] p-2 outline-none border focus:outline-hidden rounded-full text-[14px]"
-                />
-                <div className="bg-[#1e272e] p-3 rounded-full">
-                  <svg
-                    onClick={() => {
-                      setMessages([...messages, { message: inputValue }]);
-                      setInputValue("");
-                    }}
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    className="justd-icons size-5 cursor-pointer text-white font-bold"
-                    data-slot="icon"
-                    aria-hidden="true"
-                  >
-                    <path
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                      d="M6 12h3.25M6 12 3.382 4.145a.5.5 0 0 1 .698-.605l16.026 8.013a.5.5 0 0 1 0 .894L4.08 20.46a.5.5 0 0 1-.698-.605z"
-                    ></path>
-                  </svg>
-                </div>
+            <div className="fixed bottom-2 p-2 px-5 w-full flex items-center gap-2 md:justify-center">
+              <input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                type="text"
+                placeholder="Enter a Message"
+                className="w-[90%] p-2 outline-none border focus:outline-hidden rounded-full text-[14px]"
+              />
+              <div className="bg-[#1e272e] p-3 rounded-full">
+                <svg
+                  onClick={() => {
+                    setContainerHeight(containerRef.current?.scrollHeight);
+                    console.log(containerRef.current?.scrollHeight);
+                    console.log(containerHeight);
+                    setMessages([...messages, { message: inputValue }]);
+                    setInputValue("");
+                  }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  className="justd-icons size-5 cursor-pointer text-white font-bold"
+                  data-slot="icon"
+                  aria-hidden="true"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="1.5"
+                    d="M6 12h3.25M6 12 3.382 4.145a.5.5 0 0 1 .698-.605l16.026 8.013a.5.5 0 0 1 0 .894L4.08 20.46a.5.5 0 0 1-.698-.605z"
+                  ></path>
+                </svg>
               </div>
             </div>
           </>

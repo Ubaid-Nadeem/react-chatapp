@@ -60,7 +60,7 @@ function UserMenu() {
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSk740kSKRQ6-Zqea74Ftb6XQyGHQLbTt0MNQ&s"
         />
       </Menu.Trigger>
-      <Menu.Content placement="bottom right" className="sm:min-w-56">
+      <Menu.Content placement="bottom right" className="h-[40vh] sm:h-auto sm:min-w-56 ">
         <Menu.Section>
           <Menu.Header separator>
             <span className="block">Kurt Cobain</span>
@@ -68,12 +68,12 @@ function UserMenu() {
           </Menu.Header>
         </Menu.Section>
 
-        <Menu.Item href="#settings">
+        <Menu.Item >
           <IconSettings />
           Settings
         </Menu.Item>
         <Menu.Separator />
-        <Menu.Item href="#logout">
+        <Menu.Item className={"hover:bg-[red]"}>
           <IconLogout />
           Log out
         </Menu.Item>
