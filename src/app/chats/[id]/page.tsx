@@ -3,11 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Separator } from "@/components/ui";
+import { Separator, Button, Sheet } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
 import Loaders from "@/components/loader/page";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { increment } from "@/redux/slices/counter";
+
 export default function UserChats() {
   const { id } = useParams();
   const route = useRouter();
@@ -41,7 +41,6 @@ export default function UserChats() {
   ) : (
     <div className="flex">
       <Sidebar />
-      
 
       <div
         className={`fixed top-0 z-50 bg-gray-200 transition-transform sm:translate-x-0  md:relative left-0 w-full md:block transition-transform sm:translate-x-0 sm:w-[75%] h-screen  md:h-[calc(100vh)] ${
@@ -101,7 +100,7 @@ export default function UserChats() {
                     </h3>
                   </div>
                 </div>
-                <div className="flex gap-5">
+                <div className="flex gap-5 items-center">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -138,11 +137,48 @@ export default function UserChats() {
                       d="M2.75 5.75a1 1 0 0 1 1-1h10.5a1 1 0 0 1 1 1v12.5a1 1 0 0 1-1 1H3.75a1 1 0 0 1-1-1zM15.25 10l5.276-2.638a.5.5 0 0 1 .724.447v8.382a.5.5 0 0 1-.724.447L15.25 14z"
                     ></path>
                   </svg>
+                  <Sheet>
+                    <Button className={"text-black p-2"} appearance="plain">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="justd-icons size-4"
+                        data-slot="icon"
+                        aria-hidden="true"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                        ></path>
+                      </svg>
+                    </Button>
+                    <Sheet.Content >
+                      <Sheet.Header>
+                        <Sheet.Title>User</Sheet.Title>
+                        <Sheet.Description>
+                          user@gmail.com
+                        </Sheet.Description>
+                      </Sheet.Header>
+                      <Sheet.Body>
+
+                       
+                      </Sheet.Body>
+                      <Sheet.Footer>
+                        <Sheet.Close>Cancel</Sheet.Close>
+                      </Sheet.Footer>
+                    </Sheet.Content>
+                  </Sheet>
                 </div>
               </div>
             </div>
 
-            <div className=" w-full mt-[60px] z-10 messages-container  h-[calc(100vh-150px)] overflow-y-scroll py-3 px-2">
+            <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-180px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
                 <div className="chat-bubble">Hello, {chatWith.name}</div>
               </div>

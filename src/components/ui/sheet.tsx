@@ -53,7 +53,7 @@ const generateCompoundVariants = (sides: Array<Sides>) => {
 }
 
 const sheetContentStyles = tv({
-  base: "fixed z-50 grid gap-4 bg-overlay border-dark/5 dark:border-border text-overlay-fg shadow-lg transition ease-in-out",
+  base: " fixed z-50 grid gap-4 bg-overlay border-dark/5 dark:border-border text-overlay-fg shadow-lg transition ease-in-out",
   variants: {
     isEntering: {
       true: "duration-300 animate-in "
