@@ -1,9 +1,8 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Separator, TextField } from "../ui";
+import { Separator, TextField, Button, Sheet } from "../ui";
 import { useRouter, usePathname } from "next/navigation";
-import { div } from "motion/react-client";
 
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
@@ -135,26 +134,51 @@ export default function Sidebar() {
                 d="m20.25 20.25-4.123-4.123m0 0A7.25 7.25 0 1 0 5.873 5.873a7.25 7.25 0 0 0 10.253 10.253Z"
               ></path>
             </svg>
-           <div className="hover:bg-gray-100 rounded-full p-2 cursor-pointer">
-           <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="justd-icons size-4"
-              data-slot="icon"
-              aria-hidden="true"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
-              ></path>
-            </svg>
-           </div>
+            <div className=" rounded-full cursor-pointer ">
+              <Sheet>
+                <Button className={"text-black p-2"} appearance="plain">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="justd-icons size-4"
+                    data-slot="icon"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                    ></path>
+                  </svg>
+                </Button>
+                <Sheet.Content>
+                  <Sheet.Header>
+                    <Sheet.Title>Ubaid Nadeem</Sheet.Title>
+                    <Sheet.Description>ubaidahmed233@gmail.com</Sheet.Description>
+                  </Sheet.Header>
+                  <Sheet.Body>
+
+                    <h2 className="font-bold">Settings</h2>
+
+                    <ul className="bg-gray-50 mt-2 text-[14px] flex flex-col  w-full gap-2">
+                      <li className="p-2 bg-[#ecf0f1] rounded cursor-pointer hover:bg-gray-200">Edit Profile</li>
+                      <li className="p-2 bg-[#ecf0f1] rounded cursor-pointer hover:bg-gray-200">Password</li>
+                   
+                    </ul>
+                  </Sheet.Body>
+                  <Sheet.Footer>
+                    <Sheet.Close>Cancel</Sheet.Close>
+                    <Button className={"bg-danger"}>Logout</Button>
+                  </Sheet.Footer>
+                </Sheet.Content>
+              </Sheet>
+              
+            </div>
           </div>
         )}
       </div>
