@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Separator, Button, Sheet } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
 import Loaders from "@/components/loader/page";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { friendType, updateMessages } from "@/redux/slices/user";
 
 export default function UserChats() {
   const { id } = useParams();
@@ -17,19 +18,30 @@ export default function UserChats() {
   const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoaded, setIsloaded] = useState(true);
-  const [containerHeight, setContainerHeight] = useState(0);
   const messagesEndRef = useRef<any>(null);
-  const containerRef = useRef<any>(null);
-  const name = useAppSelector((state) => state.counter);
 
-  // console.log(name);
+  const dispatch = useAppDispatch();
+
+  const chatting = useAppSelector((state) => state.chatting);
+  const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
-    setIsloaded(false);
+   
+    if (!chatting.ischatting) {
+      route.push("/chats");
+    } else {
+      user.friends.filter((user: friendType) => {
+        if (user.uid == id) {
+          setMessages([...user.messages]);
+        }
+      });
+      setIsloaded(false);
+    }
   }, []);
 
   useEffect(() => {
     scrollToBottom();
+    setInputValue("");
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -89,14 +101,7 @@ export default function UserChats() {
                 <div className="flex flex-col ml-2 w-full">
                   <div className="flex justify-between">
                     <h3 className="font-bold text-[#2f3542] text-[16px]">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          // useAppDispatch(increment(1))
-                        }}
-                      >
-                        click
-                      </button>
+                      {chatting.user?.name}
                     </h3>
                   </div>
                 </div>
@@ -158,17 +163,12 @@ export default function UserChats() {
                         ></path>
                       </svg>
                     </Button>
-                    <Sheet.Content >
+                    <Sheet.Content>
                       <Sheet.Header>
                         <Sheet.Title>User</Sheet.Title>
-                        <Sheet.Description>
-                          user@gmail.com
-                        </Sheet.Description>
+                        <Sheet.Description>user@gmail.com</Sheet.Description>
                       </Sheet.Header>
-                      <Sheet.Body>
-
-                       
-                      </Sheet.Body>
+                      <Sheet.Body></Sheet.Body>
                       <Sheet.Footer>
                         <Sheet.Close>Cancel</Sheet.Close>
                       </Sheet.Footer>
@@ -180,7 +180,7 @@ export default function UserChats() {
 
             <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-180px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-end">
-                <div className="chat-bubble">Hello, {chatWith.name}</div>
+                <div className="chat-bubble">Hello, {chatting.user?.name}</div>
               </div>
 
               <div className="chat chat-start">
@@ -211,11 +211,29 @@ export default function UserChats() {
               <div className="bg-[#1e272e] p-3 rounded-full">
                 <svg
                   onClick={() => {
-                    setContainerHeight(containerRef.current?.scrollHeight);
-                    console.log(containerRef.current?.scrollHeight);
-                    console.log(containerHeight);
-                    setMessages([...messages, { message: inputValue }]);
-                    setInputValue("");
+                    setMessages([
+                      ...messages,
+                      {
+                        message: inputValue,
+                        senderID: user.uid,
+                        reciverId: chatting.user?.uid,
+                      },
+                    ]);
+
+                    dispatch(
+                      updateMessages({
+                        messages: [
+                          ...messages,
+                          {
+                            message: inputValue,
+                            senderID: user.uid,
+                            reciverId: chatting.user?.uid,
+                            time: Date.now(),
+                          },
+                        ],
+                        uid: id,
+                      })
+                    );
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"

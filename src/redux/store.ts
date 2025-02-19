@@ -1,9 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import counterSlice from "./slices/counter";
+import userSlice from "./slices/user";
+import loaderSlice from "./slices/loader";
+import chatSlice from "./slices/chatting";
 
 export const store = configureStore({
   reducer: {
-    counter : counterSlice
+    counter: counterSlice,
+    user: userSlice,
+    loader: loaderSlice,
+    chatting: chatSlice,
   },
 });
 
