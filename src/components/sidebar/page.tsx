@@ -1,7 +1,15 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { Separator, TextField, Button, Sheet, Card, Skeleton } from "../ui";
+import {
+  Separator,
+  TextField,
+  Button,
+  Sheet,
+  Card,
+  Skeleton,
+  Modal,
+} from "../ui";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/user";
@@ -11,16 +19,27 @@ import { setChatting, startChat } from "@/redux/slices/chatting";
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
   const [search, setSearch] = useState(false);
-
+  let month = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const route = useRouter();
   const path = usePathname();
-
 
   const user = useAppSelector((state) => state.user);
   const loader = useAppSelector((state) => state.loader);
 
   const dispatch = useAppDispatch();
-
   useEffect(() => {
     dispatch(setLoader(true));
     if (!user.fetchUser) {
@@ -38,24 +57,24 @@ export default function Sidebar() {
               uid: "12728uonu8u198237",
               name: "Ubaid",
               email: "ubaid@gmail.com",
-              lastMessage: "Hey Ubiad, How are you?",
+              lastMessage: undefined,
               messages: [],
-              time: "12:40",
+              lastMessageTime: 1739827437656,
             },
             {
               name: "Shahzain Tariq",
               email: "shahzain@gmail.com",
-              lastMessage: "Hey Shahzain, How are you?",
+              lastMessage: undefined,
               messages: [],
-              time: "12:40",
+              lastMessageTime: 1739827437656,
               uid: "12728uonu8u198976",
             },
             {
               uid: "12728uonu3232237",
               name: "Haider",
               email: "haider@gmail.com",
-              lastMessage: "Hey Haider, How are you?",
-              time: "12:40",
+              lastMessage: undefined,
+              lastMessageTime: 1739827437656,
               messages: [],
             },
           ],
@@ -136,6 +155,58 @@ export default function Sidebar() {
                 d="m20.25 20.25-4.123-4.123m0 0A7.25 7.25 0 1 0 5.873 5.873a7.25 7.25 0 0 0 10.253 10.253Z"
               ></path>
             </svg>
+            <Modal>
+              <Modal.Trigger>
+                <div className="p-2 hover:bg-gray-200 rounded-lg">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="justd-icons size-5"
+                    data-slot="icon"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M11.852 13.251c-3.72.065-6.428 2.567-7.18 5.915-.13.575.337 1.084.926 1.084H12.5m-.648-6.999L12 13.25q.528 0 1.029.064m-1.177-.063A8 8 0 0 0 10 13.5m3.029-.186q.501.063.971.186m-.971-.186a7.5 7.5 0 0 1 1.971.524m3.25 1.412v3m0 0v3m0-3h-3m3 0h3M15.75 6.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0"
+                    ></path>
+                  </svg>
+                </div>{" "}
+              </Modal.Trigger>
+              <Modal.Content>
+                <Modal.Header>
+                  <Modal.Title>Find Friend</Modal.Title>
+                  {/* <Modal.Description>search by email</Modal.Description> */}
+                </Modal.Header>
+                <Modal.Body className="pb-10"> <TextField placeholder="Email"/></Modal.Body>
+              </Modal.Content>
+            </Modal>
+            {/* <div className="p-2 hover:bg-gray-200 rounded-lg">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="justd-icons size-5"
+                data-slot="icon"
+                aria-hidden="true"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="M11.852 13.251c-3.72.065-6.428 2.567-7.18 5.915-.13.575.337 1.084.926 1.084H12.5m-.648-6.999L12 13.25q.528 0 1.029.064m-1.177-.063A8 8 0 0 0 10 13.5m3.029-.186q.501.063.971.186m-.971-.186a7.5 7.5 0 0 1 1.971.524m3.25 1.412v3m0 0v3m0-3h-3m3 0h3M15.75 6.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0"
+                ></path>
+              </svg>
+            </div> */}
+
             <div className=" rounded-full cursor-pointer ">
               <Sheet>
                 <Button className={"text-black p-2"} appearance="plain">
@@ -202,12 +273,18 @@ export default function Sidebar() {
         </div>
       ) : (
         <div className="absolute top-[60px] pt-5 w-full  overflow-y-scroll  h-[calc(100vh-56px)] z-50">
-          {user.friends.map((user, index) => {
+          {user.friends.map((friend, index) => {
+            let messageDate;
+            let currentTime = new Date();
+            if (friend.lastMessage?.time) {
+              messageDate = new Date(friend.lastMessage.time);
+            }
+
             return (
               <div
                 key={index}
                 onClick={() => {
-                  start(user);
+                  start(friend);
                 }}
                 className="flex items-center p-3  cursor-pointer hover:bg-gray-200"
               >
@@ -224,13 +301,25 @@ export default function Sidebar() {
 
                 <div className="flex flex-col ml-2 w-full">
                   <div className="flex justify-between">
-                    <h3 className="font-bold text-[#2f3542] text-[14px]">
-                      {user.name}
+                    <h3 className="font-bold text-[#2f3542] text-[13px]">
+                      {friend.name}
                     </h3>
-                    <span className="text-[12px] text-[#57606f]">2:30</span>
+                    <span className="text-[10px] text-[#57606f]">
+                      {currentTime.getDate() === messageDate?.getDate()
+                        ? "Today"
+                        : messageDate
+                        ? `${messageDate?.getDate()} ${
+                            month[messageDate?.getMonth()]
+                          }`
+                        : ""}
+                    </span>
                   </div>
-                  <p className="text-[12px] text-[gray] mt-1">
-                    {user.lastMessage}
+                  <p className="text-[14px] text-[gray] mt-1 line-clamp-2">
+                    {user.user?.uid == friend.lastMessage?.senderID
+                      ? `You : ${friend.lastMessage?.message}`
+                      : friend.lastMessage?.message
+                      ? `${friend.lastMessage?.message}`
+                      : ""}
                   </p>
                 </div>
               </div>

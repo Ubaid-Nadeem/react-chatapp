@@ -5,6 +5,8 @@ type messageType = {
   message: string;
   senderID: any;
   reciverId: any;
+  time: Date;
+  seen? : boolean
 };
 
 export type friendType = {
@@ -12,8 +14,7 @@ export type friendType = {
   name: string;
   email: string;
   messages: messageType[] | [];
-  lastMessage?: string;
-  time?: number;
+  lastMessage: messageType | undefined;
 };
 
 type userType = {
@@ -21,7 +22,6 @@ type userType = {
   email: string;
   uid: string;
 };
-
 
 type initialStateType = {
   user: null | userType;
@@ -31,9 +31,8 @@ type initialStateType = {
   fetchUser: boolean;
 };
 
-
 const initialState: initialStateType = {
-  user: null ,
+  user: null,
   isLogin: false,
   uid: "",
   friends: [],
@@ -55,8 +54,7 @@ export const userSlice = createSlice({
             ? {
                 ...friend,
                 messages: action.payload.messages,
-                lastMessage: action.payload.messages[lastmsgIndex].message,
-                lastMessageTime: action.payload.messages[lastmsgIndex].time,
+                lastMessage: action.payload.messages[lastmsgIndex],
               }
             : friend
         ),

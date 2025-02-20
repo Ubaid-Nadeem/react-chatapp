@@ -26,7 +26,6 @@ export default function UserChats() {
   const user = useAppSelector((state) => state.user);
 
   useEffect(() => {
-   
     if (!chatting.ischatting) {
       route.push("/chats");
     } else {
@@ -179,15 +178,11 @@ export default function UserChats() {
             </div>
 
             <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-180px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
-              <div className="chat chat-end">
-                <div className="chat-bubble">Hello, {chatting.user?.name}</div>
+              <div className="chat chat-start">
+                <div className="chat-bubble bg-[#daffc9] text-black">Hello, {chatting.user?.name}</div>
               </div>
 
-              <div className="chat chat-start">
-                <div className="chat-bubble bg-[#daffc9] text-black">
-                  Hey, How are doing Today?
-                </div>
-              </div>
+            
 
               {messages.map(({ message }, index) => {
                 return (
@@ -215,7 +210,7 @@ export default function UserChats() {
                       ...messages,
                       {
                         message: inputValue,
-                        senderID: user.uid,
+                        senderID: user.user?.uid,
                         reciverId: chatting.user?.uid,
                       },
                     ]);
@@ -226,7 +221,7 @@ export default function UserChats() {
                           ...messages,
                           {
                             message: inputValue,
-                            senderID: user.uid,
+                            senderID: user.user?.uid,
                             reciverId: chatting.user?.uid,
                             time: Date.now(),
                           },
@@ -234,6 +229,7 @@ export default function UserChats() {
                         uid: id,
                       })
                     );
+                  
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"
