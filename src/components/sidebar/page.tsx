@@ -1,24 +1,50 @@
 "use client";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import {
-  Separator,
-  TextField,
-  Button,
-  Sheet,
-  Card,
-  Skeleton,
-  Modal,
-} from "../ui";
+import { Separator, TextField, Button, Card, Skeleton } from "../ui";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/user";
 import { setLoader } from "@/redux/slices/loader";
 import { setChatting, startChat } from "@/redux/slices/chatting";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
   const [search, setSearch] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+
   let month = [
     "Jan",
     "Feb",
@@ -40,6 +66,9 @@ export default function Sidebar() {
   const loader = useAppSelector((state) => state.loader);
 
   const dispatch = useAppDispatch();
+
+  const frameworks: any[] = [];
+
   useEffect(() => {
     dispatch(setLoader(true));
     if (!user.fetchUser) {
@@ -136,27 +165,30 @@ export default function Sidebar() {
           </svg>
         ) : (
           <div className="flex items-center gap-2">
-            <svg
-              onClick={() => setSearch(!search)}
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              fill="none"
-              viewBox="0 0 24 24"
-              className="justd-icons size-5 cursor-pointer"
-              data-slot="icon"
-              aria-hidden="true"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-                d="m20.25 20.25-4.123-4.123m0 0A7.25 7.25 0 1 0 5.873 5.873a7.25 7.25 0 0 0 10.253 10.253Z"
-              ></path>
-            </svg>
-            <Modal>
-              <Modal.Trigger>
+            <div className="p-2">
+              <svg
+                onClick={() => setSearch(!search)}
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="none"
+                viewBox="0 0 24 24"
+                className="justd-icons size-5 cursor-pointer"
+                data-slot="icon"
+                aria-hidden="true"
+              >
+                <path
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.5"
+                  d="m20.25 20.25-4.123-4.123m0 0A7.25 7.25 0 1 0 5.873 5.873a7.25 7.25 0 0 0 10.253 10.253Z"
+                ></path>
+              </svg>
+            </div>
+
+            <Dialog>
+              <DialogTrigger>
                 <div className="p-2 hover:bg-gray-200 rounded-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -176,40 +208,71 @@ export default function Sidebar() {
                       d="M11.852 13.251c-3.72.065-6.428 2.567-7.18 5.915-.13.575.337 1.084.926 1.084H12.5m-.648-6.999L12 13.25q.528 0 1.029.064m-1.177-.063A8 8 0 0 0 10 13.5m3.029-.186q.501.063.971.186m-.971-.186a7.5 7.5 0 0 1 1.971.524m3.25 1.412v3m0 0v3m0-3h-3m3 0h3M15.75 6.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0"
                     ></path>
                   </svg>
-                </div>{" "}
-              </Modal.Trigger>
-              <Modal.Content>
-                <Modal.Header>
-                  <Modal.Title>Find Friend</Modal.Title>
-                  {/* <Modal.Description>search by email</Modal.Description> */}
-                </Modal.Header>
-                <Modal.Body className="pb-10"> <TextField placeholder="Email"/></Modal.Body>
-              </Modal.Content>
-            </Modal>
-            {/* <div className="p-2 hover:bg-gray-200 rounded-lg">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="none"
-                viewBox="0 0 24 24"
-                className="justd-icons size-5"
-                data-slot="icon"
-                aria-hidden="true"
-              >
-                <path
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="1.5"
-                  d="M11.852 13.251c-3.72.065-6.428 2.567-7.18 5.915-.13.575.337 1.084.926 1.084H12.5m-.648-6.999L12 13.25q.528 0 1.029.064m-1.177-.063A8 8 0 0 0 10 13.5m3.029-.186q.501.063.971.186m-.971-.186a7.5 7.5 0 0 1 1.971.524m3.25 1.412v3m0 0v3m0-3h-3m3 0h3M15.75 6.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0"
-                ></path>
-              </svg>
-            </div> */}
+                </div>
+              </DialogTrigger>
+              <DialogContent className="w-[90%]">
+                <DialogHeader>
+                  <DialogTitle className="text-center p-4">
+                    Add New Friend
+                  </DialogTitle>
+                  <DialogDescription className="text-center pb-10">
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          aria-expanded={open}
+                          className="w-full justify-between"
+                        >
+                          {value
+                            ? frameworks.find(
+                                (framework) => framework.value === value
+                              )?.label
+                            : "Search"}
+                          <ChevronsUpDown className="opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-full p-0">
+                        <Command>
+                          <CommandInput placeholder="Enter email..." />
+                          <CommandList>
+                            <CommandEmpty>No User found.</CommandEmpty>
+                            <CommandGroup>
+                              {frameworks.map((framework) => (
+                                <CommandItem
+                                  key={framework.value}
+                                  value={framework.value}
+                                  onSelect={(currentValue) => {
+                                    setValue(
+                                      currentValue === value ? "" : currentValue
+                                    );
+                                    setOpen(false);
+                                  }}
+                                >
+                                  {framework.label}
+                                  <Check
+                                    className={cn(
+                                      "ml-auto",
+                                      value === framework.value
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </CommandList>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </DialogDescription>
+                </DialogHeader>
+              </DialogContent>
+            </Dialog>
 
-            <div className=" rounded-full cursor-pointer ">
-              <Sheet>
-                <Button className={"text-black p-2"} appearance="plain">
+            <Sheet>
+              <SheetTrigger>
+                <div className="p-2 hover:bg-gray-200 rounded-lg">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="16"
@@ -228,33 +291,22 @@ export default function Sidebar() {
                       d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
                     ></path>
                   </svg>
-                </Button>
-                <Sheet.Content>
-                  <Sheet.Header>
-                    <Sheet.Title>Ubaid Nadeem</Sheet.Title>
-                    <Sheet.Description>
-                      ubaidahmed233@gmail.com
-                    </Sheet.Description>
-                  </Sheet.Header>
-                  <Sheet.Body>
-                    <h2 className="font-bold">Settings</h2>
+                </div>
+              </SheetTrigger>
+              <SheetContent className="w-full">
+                <SheetHeader>
+                  <SheetTitle>{user.user?.name}</SheetTitle>
+                  <SheetDescription>
+                    <h3>{user.user?.email}</h3>
+                    <h2 className="font-bold text-[16px] py-5">Setting</h2>
 
-                    <ul className="bg-gray-50 mt-2 text-[14px] flex flex-col  w-full gap-2">
-                      <li className="p-2 bg-[#ecf0f1] rounded cursor-pointer hover:bg-gray-200">
-                        Edit Profile
-                      </li>
-                      <li className="p-2 bg-[#ecf0f1] rounded cursor-pointer hover:bg-gray-200">
-                        Password
-                      </li>
-                    </ul>
-                  </Sheet.Body>
-                  <Sheet.Footer>
-                    <Sheet.Close>Cancel</Sheet.Close>
-                    <Button className={"bg-danger"}>Logout</Button>
-                  </Sheet.Footer>
-                </Sheet.Content>
-              </Sheet>
-            </div>
+                    <div className="footer absolute bottom-0 left-0 p-5">
+                      <Button variant={"default"} className="w-[100%]">Logout</Button>
+                    </div>
+                  </SheetDescription>
+                </SheetHeader>
+              </SheetContent>
+            </Sheet>
           </div>
         )}
       </div>

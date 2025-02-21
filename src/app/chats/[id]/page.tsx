@@ -1,14 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Separator, Button, Sheet } from "@/components/ui";
+import { Button } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
 import Loaders from "@/components/loader/page";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { friendType, updateMessages } from "@/redux/slices/user";
-
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 export default function UserChats() {
   const { id } = useParams();
   const route = useRouter();
@@ -142,8 +151,9 @@ export default function UserChats() {
                     ></path>
                   </svg>
                   <Sheet>
-                    <Button className={"text-black p-2"} appearance="plain">
-                      <svg
+                    <SheetTrigger asChild>
+                    <div className="cursor-pointer">
+                    <svg
                         xmlns="http://www.w3.org/2000/svg"
                         width="16"
                         height="16"
@@ -161,17 +171,23 @@ export default function UserChats() {
                           d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
                         ></path>
                       </svg>
-                    </Button>
-                    <Sheet.Content>
-                      <Sheet.Header>
-                        <Sheet.Title>User</Sheet.Title>
-                        <Sheet.Description>user@gmail.com</Sheet.Description>
-                      </Sheet.Header>
-                      <Sheet.Body></Sheet.Body>
-                      <Sheet.Footer>
-                        <Sheet.Close>Cancel</Sheet.Close>
-                      </Sheet.Footer>
-                    </Sheet.Content>
+                    </div>
+                    </SheetTrigger>
+                    <SheetContent className="w-full">
+                      <SheetHeader>
+                        <SheetTitle>Edit profile</SheetTitle>
+                        <SheetDescription>
+                          Make changes to your profile here. Click save when
+                          you're done.
+                        </SheetDescription>
+                      </SheetHeader>  
+
+                      <SheetFooter>
+                        <SheetClose asChild>
+                          <Button type="submit">Save changes</Button>
+                        </SheetClose>
+                      </SheetFooter>
+                    </SheetContent>
                   </Sheet>
                 </div>
               </div>
@@ -179,10 +195,10 @@ export default function UserChats() {
 
             <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-180px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
               <div className="chat chat-start">
-                <div className="chat-bubble bg-[#daffc9] text-black">Hello, {chatting.user?.name}</div>
+                <div className="chat-bubble bg-[#daffc9] text-black">
+                  Hello, {chatting.user?.name}
+                </div>
               </div>
-
-            
 
               {messages.map(({ message }, index) => {
                 return (
@@ -229,7 +245,6 @@ export default function UserChats() {
                         uid: id,
                       })
                     );
-                  
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"

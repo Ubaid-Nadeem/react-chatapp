@@ -1,7 +1,4 @@
 import type { Metadata } from "next";
-import AppNavbar from "@/components/navbar/navbar";
-import Sidebar from "@/components/sidebar/page";
-import { Separator } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "Chats",
