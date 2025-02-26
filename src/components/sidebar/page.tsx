@@ -70,53 +70,7 @@ export default function Sidebar() {
   const frameworks: any[] = [];
 
   useEffect(() => {
-    dispatch(setLoader(true));
-    if (!user.fetchUser) {
-      dispatch(
-        setUser({
-          user: {
-            name: "Ubaid Nadeem",
-            email: "ubaidahmed233@gmail.com",
-            uid: "123456789",
-          },
-          isLogin: true,
-
-          friends: [
-            {
-              uid: "12728uonu8u198237",
-              name: "Ubaid",
-              email: "ubaid@gmail.com",
-              lastMessage: undefined,
-              messages: [],
-              lastMessageTime: 1739827437656,
-            },
-            {
-              name: "Shahzain Tariq",
-              email: "shahzain@gmail.com",
-              lastMessage: undefined,
-              messages: [],
-              lastMessageTime: 1739827437656,
-              uid: "12728uonu8u198976",
-            },
-            {
-              uid: "12728uonu3232237",
-              name: "Haider",
-              email: "haider@gmail.com",
-              lastMessage: undefined,
-              lastMessageTime: 1739827437656,
-              messages: [],
-            },
-          ],
-          fetchUser: true,
-        })
-      );
-    }
-    dispatch(setLoader(false));
-
-    if (!user.isLogin) {
-      console.log("fetch data");
-    }
-
+   
     if (path == "/chats") {
       setIsChatting(false);
     } else {
