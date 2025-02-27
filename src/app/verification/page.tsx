@@ -19,7 +19,10 @@ export default function Verify() {
   const [isLoading, setIsLoading] = useState(true);
   const [pendingReq, setPendingReq] = useState(false);
   const route = useRouter();
-  const user = localStorage.getItem("CHAT_USER_VERIFY");
+  const user =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("CHAT_USER_VERIFY")
+      : null;
 
   const uri = process.env.NEXT_PUBLIC_SERVER_URL;
   useEffect(() => {
@@ -49,11 +52,10 @@ export default function Verify() {
     if (user) {
       let { code } = JSON.parse(user).data;
       if (Number(userCode) === code) {
-
         let data = await axios
           .post(`${uri}/auth/verifyuser`, {
             token: JSON.parse(user).data.token,
-            userCode : userCode,
+            userCode: userCode,
           })
           .then((response) => {
             setPendingReq(false);
@@ -61,11 +63,8 @@ export default function Verify() {
           })
           .catch((error) => {
             setPendingReq(false);
-           console.log(error);
+            console.log(error);
           });
-
-        // localStorage.removeItem("CHAT_USER_VERIFY");
-        // route.push("/chats");
       } else {
         setPendingReq(false);
         setIsError(true);
@@ -87,7 +86,11 @@ export default function Verify() {
 
       try {
         const response = await axios.post(`${uri}/auth/resendcode`, { email });
-        localStorage.setItem("CHAT_USER_VERIFY", JSON.stringify(response.data));
+        typeof window !== "undefined" &&
+          window.localStorage.setItem(
+            "CHAT_USER_VERIFY",
+            JSON.stringify(response.data)
+          );
         setTimer(30);
         setResend(false);
         Timer();
