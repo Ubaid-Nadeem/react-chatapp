@@ -14,7 +14,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [pendingReq,setPendingReq] = useState(false);
+  const [pendingReq, setPendingReq] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const route = useRouter();
@@ -24,7 +24,7 @@ export default function Login() {
     const token = getCookie("chattoken");
     if (token) {
       route.push("/chats");
-    } else{
+    } else {
       setIsLoading(false);
     }
   }, []);
@@ -62,20 +62,34 @@ export default function Login() {
 
   // API call to login
   const handleLogin = async () => {
+    setPendingReq(true);
+
     try {
       const response = await axios.post(`${uri}/auth/login`, {
         email,
         password,
       });
       if (response.data) {
-        console.log(response.data);
-        // route.push("/chats");
+        if (response.data.error) {
+          setErrorMessage(response.data.msg);
+          setIsError(true);
+          resetErrors();
+        } else {
+          console.log(response.data.data);
+          setCookie("chattoken", response.data.data.uid, {
+            expires: new Date(Date.now() + 8640000000),
+          });
+          route.push("/chats");
+        }
+        setPendingReq(false);
       } else {
+        setPendingReq(false);
         setIsError(true);
-        setErrorMessage(response.data.message);
+        setErrorMessage(response.data.msg);
         resetErrors();
       }
     } catch (error) {
+      setPendingReq(false);
       setIsError(true);
       setErrorMessage("Failed to login. Please try again.");
       resetErrors();
@@ -136,14 +150,13 @@ export default function Login() {
         <span
           className="underline cursor-pointer"
           onClick={() => {
-            setPendingReq(true)
+            setPendingReq(true);
             route.push("/signup");
           }}
         >
           Signup here!
         </span>
       </p>
-
 
       {pendingReq && <Loaders />}
     </div>

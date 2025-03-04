@@ -4,8 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { Separator, TextField, Button, Card, Skeleton } from "../ui";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setUser } from "@/redux/slices/user";
-import { setLoader } from "@/redux/slices/loader";
 import { setChatting, startChat } from "@/redux/slices/chatting";
 import {
   Dialog,
@@ -38,6 +36,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { deleteCookie } from "cookies-next";
 
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
@@ -70,7 +69,6 @@ export default function Sidebar() {
   const frameworks: any[] = [];
 
   useEffect(() => {
-   
     if (path == "/chats") {
       setIsChatting(false);
     } else {
@@ -82,6 +80,11 @@ export default function Sidebar() {
     dispatch(startChat(user));
     dispatch(setChatting(true));
     route.push(`/chats/${user.uid}`);
+  }
+
+  function logout() {
+    deleteCookie("chattoken");
+    route.push("/login");
   }
 
   return (
@@ -255,7 +258,13 @@ export default function Sidebar() {
                     <h2 className="font-bold text-[16px] py-5">Setting</h2>
 
                     <div className="footer absolute bottom-0 left-0 p-5">
-                      <Button variant={"default"} className="w-[100%]">Logout</Button>
+                      <Button
+                        variant={"default"}
+                        className="w-[100%]"
+                        onClick={logout}
+                      >
+                        Logout
+                      </Button>
                     </div>
                   </SheetDescription>
                 </SheetHeader>
@@ -321,7 +330,7 @@ export default function Sidebar() {
                     </span>
                   </div>
                   <p className="text-[14px] text-[gray] mt-1 line-clamp-2">
-                    {user.user?.uid == friend.lastMessage?.senderID
+                    {user.uid == friend.lastMessage?.senderID
                       ? `You : ${friend.lastMessage?.message}`
                       : friend.lastMessage?.message
                       ? `${friend.lastMessage?.message}`

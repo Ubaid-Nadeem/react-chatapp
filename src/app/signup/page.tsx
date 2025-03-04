@@ -76,7 +76,7 @@ export default function Signup() {
       if (!response.data.error) {
         setPendingReq(false)
         console.log(response.data);
-        localStorage.setItem("CHAT_USER_VERIFY", JSON.stringify(response.data));
+        window.localStorage.setItem("CHAT_USER_VERIFY", JSON.stringify(response.data.data));
         route.push("/verification");
       } else {
         setPendingReq(false)

@@ -1,11 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { act } from "react";
 
 type messageType = {
   message: string;
-  senderID: any;
-  reciverId: any;
-  time: Date;
+  sender: any;
+  reciver: any;
+  timestamp: Date;
   seen? : boolean
 };
 
@@ -20,7 +19,6 @@ export type friendType = {
 type userType = {
   name: string;
   email: string;
-  uid: string;
 };
 
 type initialStateType = {

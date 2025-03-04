@@ -15,9 +15,5 @@ export default async function RootLayout({
   // const token = storeCookies.get("chattoken");
   // console.log(token);
 
-  return (
-    <html lang="en">
-      <body className="">{children}</body>
-    </html>
-  );
+  return <>{children}</>;
 }

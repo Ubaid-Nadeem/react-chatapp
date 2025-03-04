@@ -226,7 +226,7 @@ export default function UserChats() {
                       ...messages,
                       {
                         message: inputValue,
-                        senderID: user.user?.uid,
+                        senderID: user.uid,
                         reciverId: chatting.user?.uid,
                       },
                     ]);
@@ -237,7 +237,7 @@ export default function UserChats() {
                           ...messages,
                           {
                             message: inputValue,
-                            senderID: user.user?.uid,
+                            senderID: user.uid,
                             reciverId: chatting.user?.uid,
                             time: Date.now(),
                           },

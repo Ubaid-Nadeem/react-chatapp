@@ -8,6 +8,7 @@ import { setUser } from "@/redux/slices/user";
 import { getCookie, setCookie } from "cookies-next";
 import { setLoader } from "@/redux/slices/loader";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 export default function Chats() {
   const [isLoaded, setIsloaded] = useState(true);
 
@@ -15,67 +16,42 @@ export default function Chats() {
   const loader = useAppSelector((state) => state.loader);
   const route = useRouter();
   const dispatch = useAppDispatch();
+  const URI = process.env.NEXT_PUBLIC_SERVER_URL;
 
   useEffect(() => {
     const token = getCookie("chattoken");
+
     if (token) {
-      setIsloaded(false);
-
-      dispatch(setLoader(true));
-      if (!user.fetchUser) {
-        dispatch(
-          setUser({
-            user: {
-              name: "Ubaid Nadeem",
-              email: "ubaidahmed233@gmail.com",
-              uid: "123456789",
-            },
-            isLogin: true,
-
-            friends: [
-              {
-                uid: "12728uonu8u198237",
-                name: "Ubaid",
-                email: "ubaid@gmail.com",
-                lastMessage: undefined,
-                messages: [],
-                lastMessageTime: 1739827437656,
-              },
-              {
-                name: "Shahzain Tariq",
-                email: "shahzain@gmail.com",
-                lastMessage: undefined,
-                messages: [],
-                lastMessageTime: 1739827437656,
-                uid: "12728uonu8u198976",
-              },
-              {
-                uid: "12728uonu3232237",
-                name: "Haider",
-                email: "haider@gmail.com",
-                lastMessage: undefined,
-                lastMessageTime: 1739827437656,
-                messages: [],
-              },
-            ],
-            fetchUser: true,
-          })
-        );
-      }
-      dispatch(setLoader(false));
-
-      if (!user.isLogin) {
-        console.log("fetch data");
+      if(!user.fetchUser){
+        setIsloaded(false);
+        dispatch(setLoader(true));
+        fetchUser(token)
       }
     } else {
       route.push("/login");
     }
   }, []);
 
-  return isLoaded ? (
+  async function fetchUser(token: any) {
+    await axios
+      .post(`${URI}/fetchuser`, { token: token })
+      .then((response) => {
+        console.log(response.data.data);
+        dispatch(setLoader(false));
+        dispatch(setUser(response.data.data));
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(setLoader(false));
+
+        // setPendingReq(false);
+      });
+  }
+
+  return loader ? (
     <Loaders />
   ) : (
-    <div className="flex">
+    <div className="flex z-1">
       <Sidebar />
       <Separator
         orientation="vertical"

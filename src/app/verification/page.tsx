@@ -11,6 +11,10 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Loaders from "@/components/loader/page";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { setUser } from "@/redux/slices/user";
+import { getCookie, setCookie } from "cookies-next";
+
 export default function Verify() {
   const [resend, setResend] = useState(false);
   const [timer, setTimer] = useState(30);
@@ -18,7 +22,11 @@ export default function Verify() {
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [pendingReq, setPendingReq] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+
   const route = useRouter();
+  const dispatch = useAppDispatch();
+
   const user =
     typeof window !== "undefined"
       ? window.localStorage.getItem("CHAT_USER_VERIFY")
@@ -29,7 +37,7 @@ export default function Verify() {
     if (user) {
       setIsLoading(false);
       Timer();
-      setEmail(JSON.parse(user).data.email);
+      setEmail(JSON.parse(user).email);
     } else {
       route.push("/login");
     }
@@ -50,26 +58,45 @@ export default function Verify() {
   async function verificationCode(userCode: any) {
     setPendingReq(true);
     if (user) {
-      let { code } = JSON.parse(user).data;
+      let { code } = JSON.parse(user);
+      console.log(code, userCode);
       if (Number(userCode) === code) {
-        let data = await axios
+        await axios
           .post(`${uri}/auth/verifyuser`, {
-            token: JSON.parse(user).data.token,
+            token: JSON.parse(user).token,
             userCode: userCode,
           })
           .then((response) => {
             setPendingReq(false);
-            return response.data;
+            if (response.data.error) {
+              console.log(response.data);
+              setErrorMsg(response.data.error);
+            } else {
+              console.log(response.data.data);
+
+              let { email, username, friends, _id } = response.data.data;
+              let user = {
+                user: { email, name: username },
+                isLogin: true,
+                uid: _id,
+                friends,
+                fetchUser: false,
+              };
+              setCookie("chattoken", _id);
+              window.localStorage.removeItem("CHAT_USER_VERIFY");
+              route.push("/chats");
+            }
           })
           .catch((error) => {
             setPendingReq(false);
-            console.log(error);
+            alert("Failed to verify code. Please try again.");
           });
       } else {
         setPendingReq(false);
-        setIsError(true);
-        handleError();
       }
+    } else {
+      setPendingReq(false);
+      alert("Failed to verify code. Please try again.");
     }
   }
 
@@ -81,11 +108,19 @@ export default function Verify() {
 
   async function resendCode() {
     if (user) {
-      const { email } = JSON.parse(user).data;
+      const { email } = JSON.parse(user);
       console.log(email);
 
       try {
-        const response = await axios.post(`${uri}/auth/resendcode`, { email });
+        const response = await axios
+          .post(`${uri}/auth/resendcode`, { email })
+          .then((response) => {
+            return response.data;
+          })
+          .catch((error) => {
+            console.error(error);
+            alert("Failed to send email");
+          });
         typeof window !== "undefined" &&
           window.localStorage.setItem(
             "CHAT_USER_VERIFY",
@@ -138,11 +173,7 @@ export default function Verify() {
           <InputOTPSlot index={5} />
         </InputOTPGroup>
       </InputOTP>
-      {isError && (
-        <p className="text-sm text-[red]">
-          Incorrect code please enter a valid code
-        </p>
-      )}
+      {isError && <p className="text-sm text-[red]">{errorMsg}</p>}
       <Button disabled={!resend} onClick={resendCode}>
         {resend ? "Resend Code" : `Resend Code in ${timer} seconds`}
       </Button>
