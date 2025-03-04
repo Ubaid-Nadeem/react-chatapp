@@ -291,8 +291,8 @@ export default function Sidebar() {
           {user.friends.map((friend, index) => {
             let messageDate;
             let currentTime = new Date();
-            if (friend.lastMessage?.time) {
-              messageDate = new Date(friend.lastMessage.time);
+            if (friend.lastMessage?.timestamp) {
+              messageDate = new Date(friend.lastMessage?.timestamp);
             }
 
             return (
@@ -330,7 +330,7 @@ export default function Sidebar() {
                     </span>
                   </div>
                   <p className="text-[14px] text-[gray] mt-1 line-clamp-2">
-                    {user.uid == friend.lastMessage?.senderID
+                    {user.uid == friend.lastMessage?.sender
                       ? `You : ${friend.lastMessage?.message}`
                       : friend.lastMessage?.message
                       ? `${friend.lastMessage?.message}`
