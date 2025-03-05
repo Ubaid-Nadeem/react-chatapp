@@ -37,7 +37,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { deleteCookie } from "cookies-next";
-
+import { logout } from "@/redux/slices/user";
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
   const [search, setSearch] = useState(false);
@@ -82,8 +82,9 @@ export default function Sidebar() {
     route.push(`/chats/${user.uid}`);
   }
 
-  function logout() {
+  function logoutUser() {
     deleteCookie("chattoken");
+    dispatch(logout());
     route.push("/login");
   }
 
@@ -261,7 +262,7 @@ export default function Sidebar() {
                       <Button
                         variant={"default"}
                         className="w-[100%]"
-                        onClick={logout}
+                        onClick={logoutUser}
                       >
                         Logout
                       </Button>

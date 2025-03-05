@@ -23,6 +23,7 @@ export default function Chats() {
 
     if (token) {
       if(!user.fetchUser){
+        console.log("Fetching User");
         setIsloaded(false);
         dispatch(setLoader(true));
         fetchUser(token)
@@ -36,7 +37,6 @@ export default function Chats() {
     await axios
       .post(`${URI}/fetchuser`, { token: token })
       .then((response) => {
-        console.log(response.data.data);
         dispatch(setLoader(false));
         dispatch(setUser(response.data.data));
       })

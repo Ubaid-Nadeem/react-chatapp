@@ -7,7 +7,7 @@ import { Button } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
 import Loaders from "@/components/loader/page";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { friendType, updateMessages } from "@/redux/slices/user";
+import { friendType, setUser, updateMessages } from "@/redux/slices/user";
 import {
   Sheet,
   SheetClose,
@@ -18,6 +18,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import axios, { AxiosHeaders } from "axios";
+import { setLoader } from "@/redux/slices/loader";
+import { chatStatus } from "@/redux/slices/user";
+
+import { getCookie } from "cookies-next";
 export default function UserChats() {
   const { id } = useParams();
   const route = useRouter();
@@ -27,6 +32,8 @@ export default function UserChats() {
   const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isLoaded, setIsloaded] = useState(true);
+  const [fetchMessages, setFetchMessages] = useState(false);
+
   const messagesEndRef = useRef<any>(null);
 
   const dispatch = useAppDispatch();
@@ -34,13 +41,44 @@ export default function UserChats() {
   const chatting = useAppSelector((state) => state.chatting);
   const user = useAppSelector((state) => state.user);
 
+  const URL = process.env.NEXT_PUBLIC_SERVER_URL;
+  const userUID = user.uid;
+
   useEffect(() => {
+    if (!user.fetchUser) {
+      let token = getCookie("chattoken");
+      if (token) {
+        fetchUser(token);
+      }
+    }
+
     if (!chatting.ischatting) {
-      route.push("/chats");
+      setIsloaded(false);
+      setFetchMessages(true);
+      route.push(`/chats`);
     } else {
       user.friends.filter((user: friendType) => {
         if (user.uid == id) {
-          setMessages([...user.messages]);
+          if (!user.fetchchat) {
+            console.log("API fetched");
+
+            axios
+              .post(`${URL}/getmessages`, { sender: userUID, reciver: id })
+              .then((res) => {
+                setMessages([...res.data.data]);
+                dispatch(updateMessages({ messages: res.data.data }));
+                dispatch(chatStatus({ uid: id }));
+                setFetchMessages(true);
+              })
+              .catch((err) => {
+                console.log(err);
+                setFetchMessages(true);
+              });
+          } else {
+            console.log("Already fetched");
+            setMessages([...user.messages]);
+            setFetchMessages(true);
+          }
         }
       });
       setIsloaded(false);
@@ -55,6 +93,21 @@ export default function UserChats() {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  async function fetchUser(token: any) {
+    await axios
+      .post(`${URL}/fetchuser`, { token: token })
+      .then((response) => {
+        dispatch(setLoader(false));
+        dispatch(setUser(response.data.data));
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(setLoader(false));
+
+        // setPendingReq(false);
+      });
+  }
 
   return isLoaded ? (
     <Loaders />
@@ -152,26 +205,26 @@ export default function UserChats() {
                   </svg>
                   <Sheet>
                     <SheetTrigger asChild>
-                    <div className="cursor-pointer">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        className="justd-icons size-4"
-                        data-slot="icon"
-                        aria-hidden="true"
-                      >
-                        <path
-                          stroke="currentColor"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
-                        ></path>
-                      </svg>
-                    </div>
+                      <div className="cursor-pointer">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="16"
+                          height="16"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          className="justd-icons size-4"
+                          data-slot="icon"
+                          aria-hidden="true"
+                        >
+                          <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                          ></path>
+                        </svg>
+                      </div>
                     </SheetTrigger>
                     <SheetContent className="w-full">
                       <SheetHeader>
@@ -180,7 +233,7 @@ export default function UserChats() {
                           Make changes to your profile here. Click save when
                           you're done.
                         </SheetDescription>
-                      </SheetHeader>  
+                      </SheetHeader>
 
                       <SheetFooter>
                         <SheetClose asChild>
@@ -194,11 +247,7 @@ export default function UserChats() {
             </div>
 
             <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-180px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
-              <div className="chat chat-start">
-                <div className="chat-bubble bg-[#daffc9] text-black">
-                  Hello, {chatting.user?.name}
-                </div>
-              </div>
+              {!fetchMessages && <Loaders />}
 
               {messages.map(({ message }, index) => {
                 return (
@@ -226,8 +275,8 @@ export default function UserChats() {
                       ...messages,
                       {
                         message: inputValue,
-                        senderID: user.uid,
-                        reciverId: chatting.user?.uid,
+                        sender: user.uid,
+                        reciver: chatting.user?.uid,
                       },
                     ]);
 
@@ -237,9 +286,9 @@ export default function UserChats() {
                           ...messages,
                           {
                             message: inputValue,
-                            senderID: user.uid,
-                            reciverId: chatting.user?.uid,
-                            time: Date.now(),
+                            sender: user.uid,
+                            reciver: chatting.user?.uid,
+                            timestamp: new Date().toDateString(),
                           },
                         ],
                         uid: id,

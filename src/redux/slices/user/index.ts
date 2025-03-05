@@ -5,7 +5,7 @@ type messageType = {
   sender: any;
   reciver: any;
   timestamp: Date;
-  seen? : boolean
+  seen?: boolean;
 };
 
 export type friendType = {
@@ -14,6 +14,7 @@ export type friendType = {
   email: string;
   messages: messageType[] | [];
   lastMessage: messageType | undefined;
+  fetchchat: boolean;
 };
 
 type userType = {
@@ -58,9 +59,23 @@ export const userSlice = createSlice({
         ),
       });
     },
-    sortList: (state, action) => {},
+    chatStatus: (state: initialStateType, action) => {
+    
+      return (state = {
+        ...state,
+        friends: state.friends.map((friend: friendType) =>
+          friend.uid === action.payload.uid
+            ? {
+                ...friend,
+                fetchchat: true,
+              }
+            : friend
+        ),
+      });
+    },
   },
 });
 
-export const { setUser, logout, updateMessages } = userSlice.actions;
+export const { setUser, logout, updateMessages, chatStatus } =
+  userSlice.actions;
 export default userSlice.reducer;
