@@ -45,6 +45,7 @@ export const userSlice = createSlice({
     setUser: (state, action) => (state = action.payload),
     logout: (state) => (state = initialState),
     updateMessages: (state: initialStateType, action) => {
+      console.log(action.payload.messages);
       let lastmsgIndex = action.payload.messages.length - 1;
       return (state = {
         ...state,
@@ -60,7 +61,6 @@ export const userSlice = createSlice({
       });
     },
     chatStatus: (state: initialStateType, action) => {
-    
       return (state = {
         ...state,
         friends: state.friends.map((friend: friendType) =>

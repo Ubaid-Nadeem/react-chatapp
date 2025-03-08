@@ -39,13 +39,13 @@ export default function UserChats() {
   const dispatch = useAppDispatch();
 
   const chatting = useAppSelector((state) => state.chatting);
-  const user = useAppSelector((state) => state.user);
+  const activeUser = useAppSelector((state) => state.user);
 
   const URL = process.env.NEXT_PUBLIC_SERVER_URL;
-  const userUID = user.uid;
+  const userUID = activeUser.uid;
 
   useEffect(() => {
-    if (!user.fetchUser) {
+    if (!activeUser.fetchUser) {
       let token = getCookie("chattoken");
       if (token) {
         fetchUser(token);
@@ -57,7 +57,7 @@ export default function UserChats() {
       setFetchMessages(true);
       route.push(`/chats`);
     } else {
-      user.friends.filter((user: friendType) => {
+      activeUser.friends.filter((user: friendType) => {
         if (user.uid == id) {
           if (!user.fetchchat) {
             console.log("API fetched");
@@ -66,7 +66,7 @@ export default function UserChats() {
               .post(`${URL}/getmessages`, { sender: userUID, reciver: id })
               .then((res) => {
                 setMessages([...res.data.data]);
-                dispatch(updateMessages({ messages: res.data.data }));
+                dispatch(updateMessages({ messages : res.data.data, uid :  id}));
                 dispatch(chatStatus({ uid: id }));
                 setFetchMessages(true);
               })
@@ -76,6 +76,7 @@ export default function UserChats() {
               });
           } else {
             console.log("Already fetched");
+            
             setMessages([...user.messages]);
             setFetchMessages(true);
           }
@@ -84,6 +85,10 @@ export default function UserChats() {
       setIsloaded(false);
     }
   }, []);
+
+  // useEffect(() => {
+  //   console.log(activeUser.friends);
+  // }, [activeUser]);
 
   useEffect(() => {
     scrollToBottom();
@@ -275,7 +280,7 @@ export default function UserChats() {
                       ...messages,
                       {
                         message: inputValue,
-                        sender: user.uid,
+                        sender: activeUser.uid,
                         reciver: chatting.user?.uid,
                       },
                     ]);
@@ -286,7 +291,7 @@ export default function UserChats() {
                           ...messages,
                           {
                             message: inputValue,
-                            sender: user.uid,
+                            sender: activeUser.uid,
                             reciver: chatting.user?.uid,
                             timestamp: new Date().toDateString(),
                           },
