@@ -21,8 +21,9 @@ import {
 import axios, { AxiosHeaders } from "axios";
 import { setLoader } from "@/redux/slices/loader";
 import { chatStatus } from "@/redux/slices/user";
-
+import { socket } from "@/HOC/Chat-hoc";
 import { getCookie } from "cookies-next";
+
 export default function UserChats() {
   const { id } = useParams();
   const route = useRouter();
@@ -60,13 +61,11 @@ export default function UserChats() {
       activeUser.friends.filter((user: friendType) => {
         if (user.uid == id) {
           if (!user.fetchchat) {
-            console.log("API fetched");
-
             axios
               .post(`${URL}/getmessages`, { sender: userUID, reciver: id })
               .then((res) => {
                 setMessages([...res.data.data]);
-                dispatch(updateMessages({ messages : res.data.data, uid :  id}));
+                dispatch(updateMessages({ messages: res.data.data, uid: id }));
                 dispatch(chatStatus({ uid: id }));
                 setFetchMessages(true);
               })
@@ -75,8 +74,6 @@ export default function UserChats() {
                 setFetchMessages(true);
               });
           } else {
-            console.log("Already fetched");
-            
             setMessages([...user.messages]);
             setFetchMessages(true);
           }
@@ -86,13 +83,18 @@ export default function UserChats() {
     }
   }, []);
 
-  // useEffect(() => {
-  //   console.log(activeUser.friends);
-  // }, [activeUser]);
+  useEffect(() => {
+    activeUser.friends.filter((user) => {
+      if (user.uid == id) {
+       
+        setMessages(user.messages);
+      }
+    });
+    // scrollToBottom()
+  }, [activeUser]);
 
   useEffect(() => {
     scrollToBottom();
-    setInputValue("");
   }, [messages]);
 
   const scrollToBottom = () => {
@@ -109,8 +111,6 @@ export default function UserChats() {
       .catch((error) => {
         console.log(error);
         dispatch(setLoader(false));
-
-        // setPendingReq(false);
       });
   }
 
@@ -251,18 +251,29 @@ export default function UserChats() {
               </div>
             </div>
 
-            <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-180px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
+            <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-150px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
               {!fetchMessages && <Loaders />}
 
-              {messages.map(({ message }, index) => {
+              {messages.map(({ message, sender }, index) => {
                 return (
-                  <div className="chat chat-end" key={index}>
-                    <div className="chat-bubble">{message}</div>
+                  <div
+                    className={`chat ${
+                      sender == id ? "chat-start" : "chat-end"
+                    }`}
+                    key={index}
+                  >
+                    <div
+                      className={`text-[14px] text-black chat-bubble ${
+                        sender == id ? "bg-[#ffffff]" : "bg-[#dbffca]"
+                      }`}
+                    >
+                      {message}
+                    </div>
                   </div>
                 );
               })}
 
-              {<div ref={messagesEndRef} />}
+              <div ref={messagesEndRef} className="mt-10" />
             </div>
 
             <div className="fixed bottom-2 p-2 px-5 w-full flex items-center gap-2 md:justify-center">
@@ -293,12 +304,20 @@ export default function UserChats() {
                             message: inputValue,
                             sender: activeUser.uid,
                             reciver: chatting.user?.uid,
-                            timestamp: new Date().toDateString(),
                           },
                         ],
+
                         uid: id,
                       })
                     );
+
+                    socket.emit("send_message", {
+                      message: inputValue,
+                      sender: activeUser.uid,
+                      reciver: chatting.user?.uid,
+                    });
+
+                    setInputValue("");
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   width="16"

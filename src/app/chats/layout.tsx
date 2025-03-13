@@ -1,5 +1,7 @@
+import ChatHOC from "@/HOC/Chat-hoc";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
+import { useEffect } from "react";
 
 export const metadata: Metadata = {
   title: "Chats",
@@ -15,5 +17,9 @@ export default async function RootLayout({
   // const token = storeCookies.get("chattoken");
   // console.log(token);
 
-  return <>{children}</>;
+  return (
+    <>
+      <ChatHOC>{children}</ChatHOC>
+    </>
+  );
 }

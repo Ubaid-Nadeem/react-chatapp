@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/sheet";
 import { deleteCookie } from "cookies-next";
 import { logout } from "@/redux/slices/user";
+
 export default function Sidebar() {
   const [isChatting, setIsChatting] = useState(false);
   const [search, setSearch] = useState(false);
@@ -58,7 +59,12 @@ export default function Sidebar() {
 
   const dispatch = useAppDispatch();
 
-  const frameworks: any[] = [];
+  const frameworks: any[] = [
+    {
+      value: "next.js",
+      label: "Next.js",
+    },
+  ];
 
   useEffect(() => {
     if (path == "/chats") {
@@ -152,10 +158,7 @@ export default function Sidebar() {
                     aria-expanded={open}
                     className="w-full justify-between bg-[none] p-0 m-0 shadow-0 border-none"
                   >
-                    {value ? (
-                      frameworks.find((framework) => framework.value === value)
-                        ?.label
-                    ) : (
+                   
                       <div className="p-2 hover:bg-gray-200 rounded-lg">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -176,7 +179,7 @@ export default function Sidebar() {
                           ></path>
                         </svg>
                       </div>
-                    )}
+                  
                   </Button>
                 </PopoverTrigger>
 
@@ -186,28 +189,31 @@ export default function Sidebar() {
                     <CommandList>
                       <CommandEmpty>No User found.</CommandEmpty>
                       <CommandGroup>
-                        {frameworks.map((framework) => (
-                          <CommandItem
-                            key={framework.value}
-                            value={framework.value}
-                            onSelect={(currentValue) => {
-                              setValue(
-                                currentValue === value ? "" : currentValue
-                              );
-                              setOpen(false);
-                            }}
-                          >
-                            {framework.label}
-                            <Check
-                              className={cn(
-                                "ml-auto",
-                                value === framework.value
-                                  ? "opacity-100"
-                                  : "opacity-0"
-                              )}
-                            />
-                          </CommandItem>
-                        ))}
+                        {frameworks.map((framework) => {
+                          console.log(framework);
+                          return (
+                            <CommandItem
+                              key={framework.value}
+                              value={framework.value}
+                              onSelect={(currentValue) => {
+                                setValue(
+                                  currentValue === value ? "" : currentValue
+                                );
+                                setOpen(false);
+                              }}
+                            >
+                              {framework.label}
+                              <Check
+                                className={cn(
+                                  "ml-auto",
+                                  value === framework.value
+                                    ? "opacity-100"
+                                    : "opacity-0"
+                                )}
+                              />
+                            </CommandItem>
+                          );
+                        })}
                       </CommandGroup>
                     </CommandList>
                   </Command>
@@ -332,7 +338,9 @@ export default function Sidebar() {
         )}
       </div>
       <div
-        className={`${open ? "block": "hidden"}  absolute z-50 w-full h-screen backdrop-blur-sm top-14 left-0`}
+        className={`${
+          open ? "block" : "hidden"
+        }  absolute z-50 w-full h-screen backdrop-blur-sm top-14 left-0`}
       ></div>
     </>
   );

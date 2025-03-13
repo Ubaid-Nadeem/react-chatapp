@@ -1,32 +1,45 @@
 "use client";
-import { Avatar, Separator, TextField } from "ui";
+import { Separator} from "ui";
 import Sidebar from "@/components/sidebar/page";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Loaders from "@/components/loader/page";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/user";
-import { getCookie, setCookie } from "cookies-next";
+import { getCookie } from "cookies-next";
 import { setLoader } from "@/redux/slices/loader";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+const URI = process.env.NEXT_PUBLIC_SERVER_URL;
+
 export default function Chats() {
   const [isLoaded, setIsloaded] = useState(true);
 
   const user = useAppSelector((state) => state.user);
   const loader = useAppSelector((state) => state.loader);
   const route = useRouter();
+  const errorRef = useRef<any | null>(null);
   const dispatch = useAppDispatch();
-  const URI = process.env.NEXT_PUBLIC_SERVER_URL;
+
 
   useEffect(() => {
     const token = getCookie("chattoken");
 
     if (token) {
-      if(!user.fetchUser){
-        console.log("Fetching User");
+      if (!user.fetchUser) {
         setIsloaded(false);
         dispatch(setLoader(true));
-        fetchUser(token)
+        fetchUser(token);
       }
     } else {
       route.push("/login");
@@ -41,10 +54,10 @@ export default function Chats() {
         dispatch(setUser(response.data.data));
       })
       .catch((error) => {
-        console.log(error);
         dispatch(setLoader(false));
-
-        // setPendingReq(false);
+        setTimeout(() => {
+          errorRef.current?.click();
+        }, 1000);
       });
   }
 
@@ -57,6 +70,21 @@ export default function Chats() {
         orientation="vertical"
         className="hidden h-[calc(100vh-49px)]  md:block"
       />
+      <AlertDialog>
+        <AlertDialogTrigger ref={errorRef}></AlertDialogTrigger>
+        <AlertDialogContent className="w-[450px] max-w-[90%]">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Network Error</AlertDialogTitle>
+            <AlertDialogDescription>
+              Unable to connect to the server. Please check your internet
+              connection.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Try Again</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import counterSlice from "./slices/counter";
 import userSlice from "./slices/user";
 import loaderSlice from "./slices/loader";
 import chatSlice from "./slices/chatting";
+import socketSlice from "./slices/socket/socket";
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     user: userSlice,
     loader: loaderSlice,
     chatting: chatSlice,
+    socket: socketSlice,
   },
 });
 

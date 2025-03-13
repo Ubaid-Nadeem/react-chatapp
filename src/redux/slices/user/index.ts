@@ -28,6 +28,7 @@ type initialStateType = {
   uid: string;
   friends: friendType[];
   fetchUser: boolean;
+  socketConnected: boolean;
 };
 
 const initialState: initialStateType = {
@@ -36,6 +37,7 @@ const initialState: initialStateType = {
   uid: "",
   friends: [],
   fetchUser: false,
+  socketConnected: false, //add socket connection status
 };
 
 export const userSlice = createSlice({
@@ -45,8 +47,7 @@ export const userSlice = createSlice({
     setUser: (state, action) => (state = action.payload),
     logout: (state) => (state = initialState),
     updateMessages: (state: initialStateType, action) => {
-      console.log(action.payload.messages);
-      let lastmsgIndex = action.payload.messages.length - 1;
+      let lastMessageIndex = action.payload.messages.length - 1;
       return (state = {
         ...state,
         friends: state.friends.map((friend: friendType) =>
@@ -54,7 +55,7 @@ export const userSlice = createSlice({
             ? {
                 ...friend,
                 messages: action.payload.messages,
-                lastMessage: action.payload.messages[lastmsgIndex],
+                lastMessage: action.payload.messages[lastMessageIndex],
               }
             : friend
         ),
@@ -73,9 +74,33 @@ export const userSlice = createSlice({
         ),
       });
     },
+    setSocketConnected: (state, action) => {
+      return (state = { ...state, socketConnected: action.payload });
+    },
+    setNewMessage: (state, action) => {
+      return (state = {
+        ...state,
+        friends: state.friends.map((friend: friendType) =>
+          friend.uid === action.payload.uid
+            ? {
+                ...friend,
+                messages: [...friend.messages, action.payload.message],
+                lastMessage: action.payload.message,
+              }
+            : friend
+        ),
+      });
+    },
   },
 });
 
-export const { setUser, logout, updateMessages, chatStatus } =
-  userSlice.actions;
+export const {
+  setUser,
+  logout,
+  updateMessages,
+  chatStatus,
+  setSocketConnected,
+  setNewMessage
+} = userSlice.actions;
+
 export default userSlice.reducer;
