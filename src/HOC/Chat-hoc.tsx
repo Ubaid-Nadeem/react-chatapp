@@ -13,6 +13,7 @@ export const socket = io(URI, {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 3000,
+  transports: ['websocket'],
 });
 
 export default function ChatHOC({
