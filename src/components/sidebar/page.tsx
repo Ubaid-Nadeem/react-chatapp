@@ -190,7 +190,7 @@ export default function Sidebar() {
                       <CommandEmpty>No User found.</CommandEmpty>
                       <CommandGroup>
                         {frameworks.map((framework) => {
-                          console.log(framework);
+                       
                           return (
                             <CommandItem
                               key={framework.value}

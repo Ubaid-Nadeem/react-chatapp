@@ -8,8 +8,9 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setNewMessage } from "@/redux/slices/user";
 
 const URI = process.env.NEXT_PUBLIC_SERVER_URL;
+const WS = process.env.NEXT_PUBLIC_WS
 
-export const socket = io(URI, {
+export const socket = io(WS, {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 3000,
