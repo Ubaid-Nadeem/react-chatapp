@@ -5,16 +5,19 @@ import { toast } from "sonner";
 import { io } from "socket.io-client";
 import { getCookie } from "cookies-next";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import { setNewMessage } from "@/redux/slices/user";
+import { setNewMessage, setFriendIndex } from "@/redux/slices/user";
 
 const URI = process.env.NEXT_PUBLIC_SERVER_URL;
-const WS = process.env.NEXT_PUBLIC_WS
+// const WS = process.env.NEXT_PUBLIC_WS
 
-export const socket = io(WS, {
+export const socket = io(URI, {
   reconnection: true,
   reconnectionAttempts: 5,
   reconnectionDelay: 3000,
-  transports: ['websocket'],
+  transports: ["websocket", "polling"],
+  path: "/socket",
+  cert: process.env.NODE_ENV === "production" ? process.env.SSL_CERT : "",
+  key: process.env.NODE_ENV === "production" ? process.env.SSL_KEY : "",
 });
 
 export default function ChatHOC({
@@ -35,19 +38,24 @@ export default function ChatHOC({
       //   console.log(data);
     });
 
-    socket.on("new_message", ({ message, sender, reciver }) => {
-     
+    socket.on("new_message", ({ message, sender, reciver, name, email }) => {
       let paramId = window.location.pathname.split("/");
 
       if (sender != paramId[2]) {
         toast("New Message", {
           position: "top-right",
-          description: `${message}`,
+          description: `${name} : ${message}`,
         });
       }
       dispatch(
-        setNewMessage({ message: { message, sender, reciver }, uid: sender })
+        setNewMessage({
+          message: { message, sender, reciver },
+          uid: sender,
+          name,
+          email,
+        })
       );
+      dispatch(setFriendIndex({ sender, reciver }));
     });
   }, []);
 

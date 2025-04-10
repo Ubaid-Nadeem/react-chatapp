@@ -285,7 +285,7 @@ export default function Sidebar() {
             {user.friends.map((friend, index) => {
               let messageDate;
               let currentTime = new Date();
-              if (friend.lastMessage?.timestamp) {
+              if (friend?.lastMessage?.timestamp) {
                 messageDate = new Date(friend.lastMessage?.timestamp);
               }
 
@@ -311,7 +311,7 @@ export default function Sidebar() {
                   <div className="flex flex-col ml-2 w-full">
                     <div className="flex justify-between">
                       <h3 className="font-bold text-[#2f3542] text-[13px]">
-                        {friend.name}
+                        {friend?.name}
                       </h3>
                       <span className="text-[10px] text-[#57606f]">
                         {currentTime.getDate() === messageDate?.getDate()
@@ -324,10 +324,10 @@ export default function Sidebar() {
                       </span>
                     </div>
                     <p className="text-[14px] text-[gray] mt-1 line-clamp-2">
-                      {user.uid == friend.lastMessage?.sender
-                        ? `You : ${friend.lastMessage?.message}`
-                        : friend.lastMessage?.message
-                        ? `${friend.lastMessage?.message}`
+                      {user.uid == friend?.lastMessage?.sender
+                        ? `You : ${friend?.lastMessage?.message}`
+                        : friend?.lastMessage?.message
+                        ? `${friend?.lastMessage?.message}`
                         : ""}
                     </p>
                   </div>

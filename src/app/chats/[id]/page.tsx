@@ -7,7 +7,13 @@ import { Button } from "@/components/ui";
 import Sidebar from "@/components/sidebar/page";
 import Loaders from "@/components/loader/page";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { friendType, setUser, updateMessages } from "@/redux/slices/user";
+import {
+  friendType,
+  setUser,
+  updateMessages,
+  setFriendIndex,
+  chatStatus,
+} from "@/redux/slices/user";
 import {
   Sheet,
   SheetClose,
@@ -20,7 +26,6 @@ import {
 } from "@/components/ui/sheet";
 import axios, { AxiosHeaders } from "axios";
 import { setLoader } from "@/redux/slices/loader";
-import { chatStatus } from "@/redux/slices/user";
 import { socket } from "@/HOC/Chat-hoc";
 import { getCookie } from "cookies-next";
 
@@ -86,7 +91,6 @@ export default function UserChats() {
   useEffect(() => {
     activeUser.friends.filter((user) => {
       if (user.uid == id) {
-       
         setMessages(user.messages);
       }
     });
@@ -310,11 +314,18 @@ export default function UserChats() {
                         uid: id,
                       })
                     );
-
+                    dispatch(
+                      setFriendIndex({
+                        sender: activeUser.uid,
+                        reciver: chatting.user?.uid,
+                      })
+                    );
                     socket.emit("send_message", {
                       message: inputValue,
                       sender: activeUser.uid,
                       reciver: chatting.user?.uid,
+                      name: activeUser.user?.name,
+                      email: activeUser.user?.email,
                     });
 
                     setInputValue("");
