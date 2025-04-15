@@ -28,35 +28,39 @@ export default function ChatHOC({
   const dispatch = useAppDispatch();
   const user = useAppSelector((state) => state.user);
 
+  const token = getCookie("chattoken");
   useEffect(() => {
-    const token = getCookie("chattoken");
-
     if (token) {
       socket.emit("join", { uid: token });
     }
-    socket.on("connected", (data) => {
-      //   console.log(data);
-    });
 
-    socket.on("new_message", ({ message, sender, reciver, name, email }) => {
-      let paramId = window.location.pathname.split("/");
-
-      if (sender != paramId[2]) {
-        toast("New Message", {
-          position: "top-right",
-          description: `${name} : ${message}`,
-        });
+    socket.on(
+      "new_message",
+      ({ message, sender, reciver, name, email, sent, unique }) => {
+      
+        let paramId = window.location.pathname.split("/");
+        if (sender != paramId[2] && sender != token) {
+          toast("New Message", {
+            position: "top-right",
+            description: `${name} : ${message}`,
+          });
+        }
+        if(sender != token){
+          dispatch(
+            setNewMessage({
+              message: { message, sender, reciver },
+              uid: sender,
+              name,
+              email,
+              sent,
+              unique,
+            })
+          );
+        }
+      
+        dispatch(setFriendIndex({ sender, reciver }));
       }
-      dispatch(
-        setNewMessage({
-          message: { message, sender, reciver },
-          uid: sender,
-          name,
-          email,
-        })
-      );
-      dispatch(setFriendIndex({ sender, reciver }));
-    });
+    );
   }, []);
 
   return <>{children}</>;

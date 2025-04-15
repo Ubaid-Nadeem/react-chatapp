@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui";
@@ -13,6 +13,7 @@ import {
   updateMessages,
   setFriendIndex,
   chatStatus,
+  DeleteMessage
 } from "@/redux/slices/user";
 import {
   Sheet,
@@ -39,7 +40,9 @@ export default function UserChats() {
   const [inputValue, setInputValue] = useState("");
   const [isLoaded, setIsloaded] = useState(true);
   const [fetchMessages, setFetchMessages] = useState(false);
-
+  const [selectedValue, setSelectedValue] = useState<any>();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const closeModelRef = useRef<HTMLLabelElement>(null);
   const messagesEndRef = useRef<any>(null);
 
   const dispatch = useAppDispatch();
@@ -79,6 +82,7 @@ export default function UserChats() {
                 setFetchMessages(true);
               });
           } else {
+            console.log(user.messages)
             setMessages([...user.messages]);
             setFetchMessages(true);
           }
@@ -97,13 +101,38 @@ export default function UserChats() {
     // scrollToBottom()
   }, [activeUser]);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  // useEffect(() => {
+  //   scrollToBottom();
+  // }, [messages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
+  async function deleteMsg(id: string) {
+    let msgIndex: number;
+    await axios
+      .post(`${URL}/deleteMsg`, {
+        unique: selectedValue.unique,
+      })
+      .then((response) => {
+        setIsDeleting(false);
+        messages.find((value, index) => {
+          if (value.unique == selectedValue.unique) {
+            msgIndex = index;
+          }
+        });
+        let MsgClone = [...messages];
+        MsgClone.splice(msgIndex, 1);
+        setMessages(MsgClone);
+        dispatch(DeleteMessage({MsgClone,friendID : chatting.user?.uid, unique:selectedValue.unique}))
+        setSelectedValue({});
+        closeModel();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 
   async function fetchUser(token: any) {
     await axios
@@ -116,6 +145,11 @@ export default function UserChats() {
         console.log(error);
         dispatch(setLoader(false));
       });
+  }
+
+  function closeModel() {
+    closeModelRef.current?.click();
+    // setSelectedValue("");
   }
 
   return isLoaded ? (
@@ -258,24 +292,63 @@ export default function UserChats() {
             <div className="relative w-full mt-[60px] z-10 messages-container  h-[calc(100vh-150px)] md:h-[calc(100vh-130px)] overflow-y-scroll py-3 px-2">
               {!fetchMessages && <Loaders />}
 
-              {messages.map(({ message, sender }, index) => {
-                return (
-                  <div
-                    className={`chat ${
-                      sender == id ? "chat-start" : "chat-end"
-                    }`}
-                    key={index}
-                  >
+              {messages.map(
+                ({ message, sender, reciver, _id, sent, unique }, index) => {
+                  return (
                     <div
-                      className={`text-[14px] text-black chat-bubble ${
-                        sender == id ? "bg-[#ffffff]" : "bg-[#dbffca]"
+                      className={`chat ${
+                        sender == id ? "chat-start" : "chat-end"
                       }`}
+                      key={index}
                     >
-                      {message}
+                      <div
+                        className={`text-[14px] text-black chat-bubble ${
+                          sender == id ? "bg-[#ffffff]" : "bg-[#dbffca]"
+                        }`}
+                      >
+                        <div
+                          className={`absolute top-3 cursor-pointer ${
+                            sender == id ? "-right-5" : "-left-5"
+                          } `}
+                          onClick={() => {
+                            setSelectedValue({ unique, sender });
+                            // console.log("select");
+                          }}
+                        >
+                          <label
+                            htmlFor="my_modal_7"
+                            className="cursor-pointer"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="16"
+                              height="16"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              className="intentui-icons size-3"
+                              data-slot="icon"
+                              aria-hidden="true"
+                            >
+                              <path
+                                stroke="currentColor"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M12 5a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                              ></path>
+                            </svg>
+                          </label>
+                        </div>
+
+                        {message}
+                      </div>
+                      {sent && (
+                        <span className="loading loading-spinner loading-xs"></span>
+                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                }
+              )}
 
               <div ref={messagesEndRef} className="mt-10" />
             </div>
@@ -291,12 +364,16 @@ export default function UserChats() {
               <div className="bg-[#1e272e] p-3 rounded-full">
                 <svg
                   onClick={() => {
+                    let unique = crypto.randomUUID();
+
                     setMessages([
                       ...messages,
                       {
                         message: inputValue,
                         sender: activeUser.uid,
                         reciver: chatting.user?.uid,
+                        unique,
+                        sent: false,
                       },
                     ]);
 
@@ -308,6 +385,8 @@ export default function UserChats() {
                             message: inputValue,
                             sender: activeUser.uid,
                             reciver: chatting.user?.uid,
+                            unique,
+                            sent: false,
                           },
                         ],
 
@@ -326,6 +405,7 @@ export default function UserChats() {
                       reciver: chatting.user?.uid,
                       name: activeUser.user?.name,
                       email: activeUser.user?.email,
+                      unique,
                     });
 
                     setInputValue("");
@@ -348,6 +428,80 @@ export default function UserChats() {
                   ></path>
                 </svg>
               </div>
+            </div>
+
+            <input type="checkbox" id="my_modal_7" className="modal-toggle" />
+
+            <div className="modal" role="dialog">
+              <div className="modal-box w-40">
+                <Button className="w-full" onClick={closeModel}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    className="intentui-icons size-4"
+                    data-slot="icon"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                      d="M17.25 8.75h3a1 1 0 0 1 1 1v8.5a1 1 0 0 1-1 1H7.75a1 1 0 0 1-1-1v-3m0-6.5h1.5m-4.5 6.5h12.5a1 1 0 0 0 1-1v-8.5a1 1 0 0 0-1-1H3.75a1 1 0 0 0-1 1v8.5a1 1 0 0 0 1 1"
+                    ></path>
+                  </svg>
+                  Copy
+                </Button>
+
+                {activeUser.uid === selectedValue?.sender && (
+                  <Button
+                    disabled={isDeleting}
+                    className="bg-[red] w-full mt-3"
+                    onClick={() => {
+                      // console.log(selectedValue);
+                      setIsDeleting(true);
+                      deleteMsg(selectedValue.unique);
+                    }}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      className="intentui-icons size-4"
+                      data-slot="icon"
+                      aria-hidden="true"
+                    >
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                        d="M4.247 8.248 5.64 19.374a1 1 0 0 0 .993.876h10.734a1 1 0 0 0 .993-.876l1.393-11.126z"
+                      ></path>
+                      <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                        d="M2.75 3.75h18.5v4.5H2.75z"
+                      ></path>
+                    </svg>
+                    {isDeleting ? "Loading..." : "Delete"}
+                  </Button>
+                )}
+              </div>
+              <label
+                className="modal-backdrop"
+                htmlFor="my_modal_7"
+                ref={closeModelRef}
+              >
+                Close
+              </label>
             </div>
           </>
         )}

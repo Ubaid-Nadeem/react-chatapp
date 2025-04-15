@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Separator, TextField, Button, Card, Skeleton } from "../ui";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -29,13 +29,17 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { deleteCookie } from "cookies-next";
-import { logout } from "@/redux/slices/user";
-
+import { logout, setUser, setNewFriend } from "@/redux/slices/user";
+import { debounce } from "@/utils/debounce";
+import axios from "axios";
 export default function Sidebar() {
+  const URL = process.env.NEXT_PUBLIC_SERVER_URL;
+
   const [isChatting, setIsChatting] = useState(false);
   const [search, setSearch] = useState(false);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
+  const [users, setUsers] = useState<any>([]);
 
   let month = [
     "Jan",
@@ -85,6 +89,22 @@ export default function Sidebar() {
     dispatch(logout());
     route.push("/login");
   }
+
+  async function handleSearch(value: any) {
+    await axios
+      .post(`${URL}/searchuser`, { search: value })
+      .then((res) => {
+        setUsers(res.data.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+  const debouncedSearch = useCallback(debounce(handleSearch, 500), []);
+
+  const handleChange = (e: any) => {
+    debouncedSearch(e);
+  };
 
   return (
     <>
@@ -158,43 +178,45 @@ export default function Sidebar() {
                     aria-expanded={open}
                     className="w-full justify-between bg-[none] p-0 m-0 shadow-0 border-none"
                   >
-                   
-                      <div className="p-2 hover:bg-gray-200 rounded-lg">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          className="justd-icons size-5"
-                          data-slot="icon"
-                          aria-hidden="true"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="1.5"
-                            d="M11.852 13.251c-3.72.065-6.428 2.567-7.18 5.915-.13.575.337 1.084.926 1.084H12.5m-.648-6.999L12 13.25q.528 0 1.029.064m-1.177-.063A8 8 0 0 0 10 13.5m3.029-.186q.501.063.971.186m-.971-.186a7.5 7.5 0 0 1 1.971.524m3.25 1.412v3m0 0v3m0-3h-3m3 0h3M15.75 6.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0"
-                          ></path>
-                        </svg>
-                      </div>
-                  
+                    <div className="p-2 hover:bg-gray-200 rounded-lg">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        className="justd-icons size-5"
+                        data-slot="icon"
+                        aria-hidden="true"
+                      >
+                        <path
+                          stroke="currentColor"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="1.5"
+                          d="M11.852 13.251c-3.72.065-6.428 2.567-7.18 5.915-.13.575.337 1.084.926 1.084H12.5m-.648-6.999L12 13.25q.528 0 1.029.064m-1.177-.063A8 8 0 0 0 10 13.5m3.029-.186q.501.063.971.186m-.971-.186a7.5 7.5 0 0 1 1.971.524m3.25 1.412v3m0 0v3m0-3h-3m3 0h3M15.75 6.5a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0"
+                        ></path>
+                      </svg>
+                    </div>
                   </Button>
                 </PopoverTrigger>
 
                 <PopoverContent className="p-0 mt-3 mr-10 bg-gray-200">
                   <Command>
-                    <CommandInput placeholder="Enter email..." />
+                    <CommandInput
+                      placeholder="Enter email..."
+                      onValueChange={(e) => {
+                        handleChange(e);
+                      }}
+                    />
                     <CommandList>
-                      <CommandEmpty>No User found.</CommandEmpty>
+                      <CommandEmpty>No user found.</CommandEmpty>
                       <CommandGroup>
-                        {frameworks.map((framework) => {
-                       
+                        {users.map((newuser: any) => {
                           return (
                             <CommandItem
-                              key={framework.value}
-                              value={framework.value}
+                              key={newuser._id}
+                              value={newuser.email}
                               onSelect={(currentValue) => {
                                 setValue(
                                   currentValue === value ? "" : currentValue
@@ -202,15 +224,56 @@ export default function Sidebar() {
                                 setOpen(false);
                               }}
                             >
-                              {framework.label}
+                              {newuser.username}
                               <Check
                                 className={cn(
                                   "ml-auto",
-                                  value === framework.value
+                                  value === newuser.username
                                     ? "opacity-100"
                                     : "opacity-0"
                                 )}
                               />
+                              {newuser._id === user.uid ? (
+                                <span className="text-[blue] text-[12px] font-bold p-2">
+                                  You
+                                </span>
+                              ) : (
+                                <button
+                                  className="bg-[blue] text-white p-2 rounded-md"
+                                  onClick={() => {
+                                    setUsers([]);
+                                    let userCheck = false;
+                                    user.friends.find((value) => {
+                                      if (value.uid === newuser._id) {
+                                        userCheck = true;
+                                        start(value);
+                                      }
+                                    });
+                                    if (!userCheck) {
+                                      dispatch(
+                                        setNewFriend({
+                                          uid: newuser._id,
+                                          name: newuser.username,
+                                          email: newuser.email,
+                                        })
+                                      );
+                                      start({
+                                        messages: [],
+                                        uid: newuser._id,
+                                        name: newuser.username,
+                                        email: newuser.email,
+                                        lastMessage: undefined,
+                                        fetchchat: false,
+                                      });
+                                    }
+                                  }}
+                                >
+                                  chat
+                                </button>
+                              )}
+                              <p className="absolute top-7 text-[10px] text-gray">
+                                {newuser.email}
+                              </p>
                             </CommandItem>
                           );
                         })}
@@ -323,13 +386,19 @@ export default function Sidebar() {
                           : ""}
                       </span>
                     </div>
-                    <p className="text-[14px] text-[gray] mt-1 line-clamp-2">
-                      {user.uid == friend?.lastMessage?.sender
-                        ? `You : ${friend?.lastMessage?.message}`
-                        : friend?.lastMessage?.message
-                        ? `${friend?.lastMessage?.message}`
-                        : ""}
-                    </p>
+                    {friend.messages.length == 0 ? (
+                      <p className="text-[14px] text-[gray] mt-1 line-clamp-1 font-bold"> 
+                      now you can messages to each other
+                      </p>
+                    ) : (
+                      <p className="text-[14px] text-[gray] mt-1 line-clamp-1">
+                        {user.uid == friend?.lastMessage?.sender
+                          ? `You : ${friend?.lastMessage?.message}`
+                          : friend?.lastMessage?.message
+                          ? `${friend?.lastMessage?.message}`
+                          : ""}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

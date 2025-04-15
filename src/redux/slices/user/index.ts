@@ -5,6 +5,7 @@ type messageType = {
   sender: any;
   reciver: any;
   timestamp: Date;
+  unique: String;
   seen?: boolean;
 };
 
@@ -116,18 +117,62 @@ export const userSlice = createSlice({
       });
     },
     setFriendIndex: (state, action) => {
-      // const { sender, reciver } = action.payload;
-      // const [frined] = state.friends.filter((value) => {
-      //   if (value.uid == sender || value.uid == reciver) {
-      //     return value;
-      //   }
-      // });
-      // let friendClone = [...state.friends];
-      // friendClone[0] = frined;
-      // return (state = {
-      //   ...state,
-      //   friends: friendClone,
-      // });
+      const { sender, reciver } = action.payload;
+      let friendClone = [...state.friends];
+      friendClone.find((value, index) => {
+        if (value.uid == sender || value.uid == reciver) {
+          friendClone.splice(index, 1);
+          friendClone.unshift(value);
+        }
+      });
+
+      return (state = {
+        ...state,
+        friends: friendClone,
+      });
+    },
+    setNewFriend: (state, action) => {
+      let { email, name, uid } = action.payload;
+
+      let friendClone = [...state.friends];
+      friendClone.unshift({
+        messages: [],
+        uid: uid,
+        name: name,
+        email: email,
+        lastMessage: undefined,
+        fetchchat: false,
+      });
+      return (state = {
+        ...state,
+        friends: friendClone,
+      });
+    },
+    DeleteMessage: (state, action) => {
+      let { MsgClone, friendID, unique } = action.payload;
+      let friends = state.friends.map((friend) => {
+        if (friend.uid == friendID) {
+          if (friend.lastMessage?.unique === unique) {
+            return {
+              ...friend,
+              messages: MsgClone,
+              lastMessage: MsgClone[MsgClone.length - 1],
+            };
+          } else {
+            return {
+              ...friend,
+              messages: MsgClone,
+            };
+          }
+        } else {
+          return friend;
+        }
+      });
+
+      return (state = {
+        ...state,
+        friends: friends,
+      });
     },
   },
 });
@@ -140,6 +185,8 @@ export const {
   setSocketConnected,
   setNewMessage,
   setFriendIndex,
+  setNewFriend,
+  DeleteMessage,
 } = userSlice.actions;
 
 export default userSlice.reducer;
